@@ -13,9 +13,8 @@
         android:layout_height="350dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
-        android:background="@android:color/white"
-        android:src="@drawable/ic_launcher_background"
-        />
+        android:background="@android:color/transparent"
+         />
 
 
     <LinearLayout
