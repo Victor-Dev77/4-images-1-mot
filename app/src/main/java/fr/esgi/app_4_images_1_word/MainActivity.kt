@@ -16,8 +16,8 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
-
-
+import fr.esgi.app_4_images_1_word.models.Level
+import fr.esgi.app_4_images_1_word.models.User
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private lateinit var imageLevel: ImageView
+    private val listLevels = ArrayList<Level>()
+    private lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
+        user = User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 0, "")
         //updateUI(currentUser)
         Log.d("toto", "user: ${currentUser}")
 
@@ -50,8 +53,8 @@ class MainActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("toto", "signInAnonymously:success")
-                    val user = auth.currentUser
-                    Log.d("toto", "user: ${user!!.isAnonymous}")
+                    this.user = User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 0, "")
+                    Log.d("toto", "user: ${auth.currentUser!!.isAnonymous}")
                    // updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
@@ -92,10 +95,14 @@ class MainActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
+                    val map = document.data
+                    val level = Level(document.id, map["image"] as String, map["word"] as String, map["difficulty"] as String)
+                    listLevels.add(level)
                     Log.d("toto", "${document.id} => ${document.data}")
-                     DownloadImageTask(imageLevel)
-                        .execute(document.data["image"] as? String)
                 }
+                DownloadImageTask(imageLevel)
+                    .execute(listLevels.first().image)
+                user.actualLevel = listLevels.first().id
             }
             .addOnFailureListener { exception ->
                 Log.d("toto", "Error getting documents: ", exception)
