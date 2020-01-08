@@ -16,6 +16,10 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
+import androidx.core.view.setPadding
 import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.models.User
 
@@ -25,8 +29,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private lateinit var imageLevel: ImageView
+    private lateinit var linearWord: LinearLayout
+    private lateinit var btnTest: Button
     private val listLevels = ArrayList<Level>()
     private lateinit var user: User
+    private lateinit var actualLevel: Level
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,12 +110,38 @@ class MainActivity : AppCompatActivity() {
                 DownloadImageTask(imageLevel)
                     .execute(listLevels.first().image)
                 user.actualLevel = listLevels.first().id
+                actualLevel = listLevels.first()
+                updateUI()
             }
             .addOnFailureListener { exception ->
                 Log.d("toto", "Error getting documents: ", exception)
             }
     }
+
+    private fun updateUI() {
+        linearWord = findViewById(R.id.linearResultWord)
+        btnTest = findViewById(R.id.btnTest)
+        (1..actualLevel.word.length).forEach {
+            var view = Button(this)
+            var params = LinearLayout.LayoutParams(
+                100,
+                100
+            )
+            params.setMargins(4,4,4,4)
+            view.layoutParams = params
+            view.setBackgroundResource(R.drawable.btn_word_shape)
+            view.setPadding(8)
+            view.id = it
+            view.text = "A"
+            view.width = 50
+            view.height = 50
+            linearWord.addView(view)
+            Log.d("toto", "ok")
+        }
+    }
 }
+
+
 
 // Utiliser la librairie Picasso !!
 private class DownloadImageTask(internal var bmImage: ImageView) :

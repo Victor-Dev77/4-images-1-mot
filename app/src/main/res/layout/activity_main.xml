@@ -27,44 +27,15 @@
         android:gravity="center">
 
         <Button
+        android:id="@+id/btnTest"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="4dp"
+        android:visibility="gone"
         android:background="@drawable/btn_word_shape"
         android:padding="8dp"
         android:text="C" />
 
-        <Button
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_word_shape"
-            android:padding="8dp"
-            android:text="D" />
-
-        <Button
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_word_shape"
-            android:padding="8dp"
-            android:text="E" />
-
-        <Button
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_word_shape"
-            android:padding="8dp"
-            android:text="F" />
-
-        <Button
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_word_shape"
-            android:padding="8dp"
-            android:text="G" />
 
     </LinearLayout>
 
