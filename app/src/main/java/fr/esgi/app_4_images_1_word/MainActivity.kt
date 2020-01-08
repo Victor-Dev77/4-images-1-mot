@@ -1,23 +1,22 @@
 package fr.esgi.app_4_images_1_word
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.firebase.auth.FirebaseAuth
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.os.AsyncTask
-import android.widget.Button
-import android.widget.LinearLayout
 import androidx.core.view.setPadding
 import com.squareup.picasso.Picasso
 import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.models.User
+import android.view.ViewGroup
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private lateinit var imageLevel: ImageView
     private lateinit var linearWord: LinearLayout
-    private lateinit var btnTest: Button
+    private lateinit var gridLetters: GridLayout
     private val listLevels = ArrayList<Level>()
     private lateinit var user: User
     private lateinit var actualLevel: Level
@@ -125,49 +124,98 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
+        // Update Word
         linearWord = findViewById(R.id.linearResultWord)
-        btnTest = findViewById(R.id.btnTest)
         (1..actualLevel.word.length).forEach {
-            var view = Button(this)
-            var params = LinearLayout.LayoutParams(
-                100,
-                100
-            )
-            params.setMargins(4,4,4,4)
-            view.layoutParams = params
-            view.setBackgroundResource(R.drawable.btn_word_shape)
-            view.setPadding(8)
-            view.id = it
-            view.text = "A"
+            val view = createWordButton()
             linearWord.addView(view)
             Log.d("toto", "ok")
         }
-    }
 
-
-}
-
-
-
-// Utiliser la librairie Picasso !!
-private class DownloadImageTask(internal var bmImage: ImageView) :
-    AsyncTask<String, Void, Bitmap>() {
-
-    override fun doInBackground(vararg urls: String): Bitmap? {
-        val urldisplay = urls[0]
-        var mIcon11: Bitmap? = null
-        try {
-            val `in` = java.net.URL(urldisplay).openStream()
-            mIcon11 = BitmapFactory.decodeStream(`in`)
-        } catch (e: Exception) {
-            Log.e("Error", e.message)
-            e.printStackTrace()
+        // Update Random Letters
+        gridLetters = findViewById(R.id.gridRandomLetter)
+        for (i in 0 until gridLetters.childCount) {
+            val child = gridLetters.getChildAt(i) as Button
+            child.setOnClickListener {
+                clickRandomLetter(it, i)
+            }
         }
-
-        return mIcon11
     }
 
-    override fun onPostExecute(result: Bitmap) {
-        bmImage.setImageBitmap(result)
+    private fun createWordButton() : View {
+        val view = Button(this)
+        val params = LinearLayout.LayoutParams(
+            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f, resources.displayMetrics)).toInt(),
+            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f, resources.displayMetrics)).toInt()
+        )
+        params.setMargins(4,4,4,4)
+        view.layoutParams = params
+        view.setBackgroundResource(R.drawable.btn_word_shape)
+        view.setPadding(8)
+        view.text = " " // const final NULL_TEXT
+        return view
     }
+
+    private fun createLetterButton() : View {
+        val view = Button(this)
+        val params = LinearLayout.LayoutParams(
+            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f, resources.displayMetrics)).toInt(),
+            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f, resources.displayMetrics)).toInt()
+        )
+        params.setMargins(4,4,4,4)
+        view.layoutParams = params
+        view.setBackgroundResource(R.drawable.btn_selection_letter_shape)
+        view.setBackgroundColor(Color.TRANSPARENT)
+        view.setPadding(8)
+        view.text = " " // const final NULL_TEXT
+        return view
+    }
+
+    private fun clickRandomLetter(view: View?, index: Int) {
+        if (view != null) {
+            val parent = view.parent as ViewGroup
+            when (parent.id) {
+                R.id.gridRandomLetter -> insertRandomLetter(view, index)
+                R.id.linearResultWord -> removeRandomLetter(view, index)
+            }
+
+           // view.isEnabled = !view.isEnabled
+        }
+    }
+
+    private fun insertRandomLetter(view: View, index: Int) {
+        for (i in 0 until linearWord.childCount) {
+            var child = linearWord.getChildAt(i) as Button
+            if (child.text == " ") {
+                replaceView(child, view)
+                gridLetters.addView(createLetterButton(), index)
+                break
+            }
+        }
+    }
+
+    private fun removeRandomLetter(view: View, index: Int) {
+        val viewWord = createWordButton()
+        replaceView(view, viewWord)
+        gridLetters.removeViewAt(index)
+        gridLetters.addView(view, index)
+    }
+
+    private fun removeView(view: View) {
+        val parent = view.parent as? ViewGroup
+        parent?.removeView(view)
+    }
+
+    private fun replaceView(currentView: View, newView: View) {
+        val parent = currentView.parent as? ViewGroup
+        val index = parent?.indexOfChild(currentView)
+        if (index != null) {
+            removeView(currentView)
+            removeView(newView)
+            parent.addView(newView, index)
+        }
+    }
+
+
+
 }

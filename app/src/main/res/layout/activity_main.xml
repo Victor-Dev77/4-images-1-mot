@@ -26,15 +26,6 @@
         android:layout_marginTop="32dp"
         android:gravity="center">
 
-        <Button
-        android:id="@+id/btnTest"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_margin="4dp"
-        android:visibility="gone"
-        android:background="@drawable/btn_word_shape"
-        android:padding="8dp"
-        android:text="C" />
 
 
     </LinearLayout>
@@ -49,6 +40,7 @@
         android:columnCount="7">
 
         <Button
+            android:id="@+id/btn1"
             android:layout_column="0"
             android:layout_row="0"
             android:layout_width="50dp"
@@ -114,7 +106,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
+            android:background="@drawable/btn_bonus"
             android:padding="8dp"
             android:text="G" />
 
@@ -186,7 +178,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
+            android:background="@drawable/btn_bonus"
             android:padding="8dp"
             android:text="G" />
 
