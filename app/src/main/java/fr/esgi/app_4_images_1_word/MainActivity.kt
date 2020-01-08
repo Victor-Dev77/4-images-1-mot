@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         val settings = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
             .build()
-       // db.firestoreSettings = settings
+        db.firestoreSettings = settings
         // [END set_firestore_settings]
     }
 
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         val settings = FirebaseFirestoreSettings.Builder()
             .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
             .build()
-      //  db.firestoreSettings = settings
+        db.firestoreSettings = settings
         // [END fs_setup_cache]
     }
 
@@ -137,7 +137,11 @@ class MainActivity : AppCompatActivity() {
         for (i in 0 until gridLetters.childCount) {
             val child = gridLetters.getChildAt(i) as Button
             child.setOnClickListener {
-                clickRandomLetter(it, i)
+                when (i) {
+                    6 -> Log.d("toto", "Bonus en HAUT")
+                    13 -> Log.d("toto", "Bonus en BAS")
+                    else -> clickRandomLetter(it, i)
+                }
             }
         }
     }
@@ -166,6 +170,7 @@ class MainActivity : AppCompatActivity() {
         view.layoutParams = params
         view.setBackgroundResource(R.drawable.btn_selection_letter_shape)
         view.setBackgroundColor(Color.TRANSPARENT)
+        view.isEnabled = false
         view.setPadding(8)
         view.text = " " // const final NULL_TEXT
         return view
