@@ -3,10 +3,6 @@ package fr.esgi.app_4_images_1_word
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.firebase.auth.FirebaseAuth
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -16,10 +12,10 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.core.view.setPadding
+import com.squareup.picasso.Picasso
 import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.models.User
 
@@ -34,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private val listLevels = ArrayList<Level>()
     private lateinit var user: User
     private lateinit var actualLevel: Level
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,11 +48,13 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
-        user = User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 0, "")
+        if (currentUser != null)
+            user = User(currentUser.uid, currentUser.displayName as String, 0, "")
         //updateUI(currentUser)
         Log.d("toto", "user: ${currentUser}")
 
         auth.signInAnonymously()
+            .addOnFailureListener { res -> Log.d("toto", "NOP NOP")}
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
@@ -84,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         val settings = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
             .build()
-        db.firestoreSettings = settings
+       // db.firestoreSettings = settings
         // [END set_firestore_settings]
     }
 
@@ -93,13 +92,14 @@ class MainActivity : AppCompatActivity() {
         val settings = FirebaseFirestoreSettings.Builder()
             .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
             .build()
-        db.firestoreSettings = settings
+      //  db.firestoreSettings = settings
         // [END fs_setup_cache]
     }
 
     private fun getAllLevels() {
         db.collection("levels")
             .get()
+            .addOnCanceledListener { Log.d("toto", "errerur loading data")}
             .addOnSuccessListener { result ->
                 for (document in result) {
                     val map = document.data
@@ -107,11 +107,17 @@ class MainActivity : AppCompatActivity() {
                     listLevels.add(level)
                     Log.d("toto", "${document.id} => ${document.data}")
                 }
-                DownloadImageTask(imageLevel)
-                    .execute(listLevels.first().image)
-                user.actualLevel = listLevels.first().id
-                actualLevel = listLevels.first()
-                updateUI()
+                if (listLevels.size > 0) {
+
+                    Picasso.get().load(listLevels.first().image).into(imageLevel)
+
+                    //DownloadImageTask(imageLevel)
+                    //    .execute(listLevels.first().image)
+                    user.actualLevel = listLevels.first().id
+                    actualLevel = listLevels.first()
+                    updateUI()
+                }
+
             }
             .addOnFailureListener { exception ->
                 Log.d("toto", "Error getting documents: ", exception)
@@ -133,12 +139,12 @@ class MainActivity : AppCompatActivity() {
             view.setPadding(8)
             view.id = it
             view.text = "A"
-            view.width = 50
-            view.height = 50
             linearWord.addView(view)
             Log.d("toto", "ok")
         }
     }
+
+
 }
 
 
