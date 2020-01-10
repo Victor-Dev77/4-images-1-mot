@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val listLevels = ArrayList<Level>()
     private lateinit var user: User
     private lateinit var actualLevel: Level
+    private var word = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,6 +115,7 @@ class MainActivity : AppCompatActivity() {
                     //    .execute(listLevels.first().image)
                     user.actualLevel = listLevels.first().id
                     actualLevel = listLevels.first()
+                    word = " ".repeat(listLevels.first().word.length)
                     updateUI()
                 }
 
@@ -194,16 +196,28 @@ class MainActivity : AppCompatActivity() {
             if (child.text == " ") {
                 replaceView(child, view)
                 gridLetters.addView(createLetterButton(), index)
+                val buttonLetter = view as Button
+                word = StringBuilder(word).replace(i, i + 1, buttonLetter.text.toString()).toString()
+                Log.d("toto", "Word: $word - lenght: ${word.length}")
                 break
             }
+        }
+        if (verifyValidWord()) {
+            Log.d("toto", "MOT TROUVE !!!")
+        } else {
+            Log.d("toto", "MOT ERRONNE")
         }
     }
 
     private fun removeRandomLetter(view: View, index: Int) {
         val viewWord = createWordButton()
+        val indexLetter = (view.parent as ViewGroup).indexOfChild(view)
         replaceView(view, viewWord)
         gridLetters.removeViewAt(index)
         gridLetters.addView(view, index)
+        Log.d("toto", "IndexLetter: $indexLetter")
+        word = StringBuilder(word).replace(indexLetter, indexLetter + 1, " ").toString()
+        Log.d("toto", "Word: $word - lenght: ${word.length}")
     }
 
     private fun removeView(view: View) {
@@ -221,6 +235,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun verifyValidWord() : Boolean {
+        if (word.contains(' '))
+            return false
+        return word.trim().toLowerCase() == actualLevel.word.trim().toLowerCase()
+    }
 
 
 }
