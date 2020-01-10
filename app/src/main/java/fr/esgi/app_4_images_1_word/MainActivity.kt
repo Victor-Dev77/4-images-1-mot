@@ -6,6 +6,8 @@ import android.os.Bundle
 import com.google.firebase.auth.FirebaseAuth
 import android.util.Log
 import android.util.TypedValue
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,8 +17,7 @@ import com.squareup.picasso.Picasso
 import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.models.User
 import android.view.ViewGroup
-
-
+import androidx.appcompat.app.ActionBar
 
 
 class MainActivity : AppCompatActivity() {
@@ -37,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         // remove status bar
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_main)
+        val actionBar = getSupportActionBar()
+        actionBar!!.setTitle("Niveau: 1")
         imageLevel = findViewById(R.id.imageLevel)
         auth = FirebaseAuth.getInstance()
         setup()
@@ -72,6 +75,31 @@ class MainActivity : AppCompatActivity() {
 
                 // ...
             }
+    }
+
+    //setting menu in action bar
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_toolbar,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    // actions on click menu items
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_coin -> {
+            // User chose the "Print" item
+            Toast.makeText(this,"Coin action",Toast.LENGTH_LONG).show()
+            true
+        }
+        android.R.id.home ->{
+            Toast.makeText(this,"Home action",Toast.LENGTH_LONG).show()
+            true
+        }
+
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setup() {
