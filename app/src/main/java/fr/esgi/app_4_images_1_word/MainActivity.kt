@@ -136,6 +136,14 @@ class MainActivity : AppCompatActivity() {
 
         // Update Random Letters
         gridLetters = findViewById(R.id.gridRandomLetter)
+        val STRING_CHARACTERS = ('a'..'z').toList().toTypedArray()
+        val letterArray : ArrayList<Char> = actualLevel.word.toList() as ArrayList<Char>
+        Log.d("toto", "$letterArray")
+        (0..(12 - actualLevel.word.length)).forEach {
+            letterArray.add(STRING_CHARACTERS.random())
+        }
+        letterArray.shuffle()
+
         for (i in 0 until gridLetters.childCount) {
             val child = gridLetters.getChildAt(i) as Button
             child.setOnClickListener {
@@ -145,6 +153,8 @@ class MainActivity : AppCompatActivity() {
                     else -> clickRandomLetter(it, i)
                 }
             }
+            if (i != 6 && i != 13)
+                child.text = letterArray[i].toString()
         }
     }
 
