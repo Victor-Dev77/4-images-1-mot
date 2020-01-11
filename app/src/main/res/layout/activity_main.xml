@@ -7,6 +7,53 @@
     android:background="@color/background"
     tools:context=".MainActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:title="Niveau: 1"
+        app:titleTextColor="@android:color/white">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:id="@+id/toolbar_level_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:text="Niveau 1" />
+
+            <ImageView
+                android:id="@+id/toolbar_coin_iv"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_toStartOf="@+id/toolbar_coin_tv"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/coin" />
+
+            <TextView
+                android:id="@+id/toolbar_coin_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="@android:color/white"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="16dp"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:text="400" />
+
+        </RelativeLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+
     <ImageView
         android:id="@+id/imageLevel"
         android:layout_width="350dp"
@@ -14,7 +61,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
         android:background="@android:color/transparent"
-         />
+        android:layout_below="@+id/toolbar" />
 
 
     <LinearLayout
@@ -30,170 +77,166 @@
 
     </LinearLayout>
 
-    <GridLayout
-        android:id="@+id/gridRandomLetter"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearResultWord"
-        android:layout_marginTop="16dp"
-        android:rowCount="2"
-        android:columnCount="7">
+        android:layout_marginTop="16dp">
+
+        <GridLayout
+            android:id="@+id/gridRandomLetter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:rowCount="2"
+            android:columnCount="6">
+
+            <Button
+                android:id="@+id/btn1"
+                android:layout_column="0"
+                android:layout_row="0"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="A" />
+
+            <Button
+                android:layout_column="1"
+                android:layout_row="0"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="B" />
+
+            <Button
+                android:layout_column="2"
+                android:layout_row="0"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="C" />
+
+            <Button
+                android:layout_column="3"
+                android:layout_row="0"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="D" />
+
+            <Button
+                android:layout_column="4"
+                android:layout_row="0"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="E" />
+
+            <Button
+                android:layout_column="5"
+                android:layout_row="0"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="F" />
+
+
+            <Button
+                android:layout_column="0"
+                android:layout_row="1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="A" />
+
+            <Button
+                android:layout_column="1"
+                android:layout_row="1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="B" />
+
+            <Button
+                android:layout_column="2"
+                android:layout_row="1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="C" />
+
+            <Button
+                android:layout_column="3"
+                android:layout_row="1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="D" />
+
+            <Button
+                android:layout_column="4"
+                android:layout_row="1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="E" />
+
+            <Button
+                android:layout_column="5"
+                android:layout_row="1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_selection_letter_shape"
+                android:padding="8dp"
+                android:text="F" />
+
+        </GridLayout>
 
         <Button
-            android:id="@+id/btn1"
-            android:layout_column="0"
-            android:layout_row="0"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="0"
-            android:text="A" />
-
-        <Button
-            android:layout_column="1"
-            android:layout_row="0"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="1"
-            android:text="B" />
-
-        <Button
-            android:layout_column="2"
-            android:layout_row="0"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="2"
-            android:text="C" />
-
-        <Button
-            android:layout_column="3"
-            android:layout_row="0"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="3"
-            android:text="D" />
-
-        <Button
-            android:layout_column="4"
-            android:layout_row="0"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="4"
-            android:text="E" />
-
-        <Button
-            android:layout_column="5"
-            android:layout_row="0"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="5"
-            android:text="F" />
-
-        <Button
-            android:layout_column="6"
-            android:layout_row="0"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_bonus"
-            android:padding="8dp"
-            android:text="G" />
-
-
-
-        <Button
-            android:layout_column="0"
-            android:layout_row="1"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="6"
-            android:text="A" />
-
-        <Button
-            android:layout_column="1"
-            android:layout_row="1"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="7"
-            android:text="B" />
-
-        <Button
-            android:layout_column="2"
-            android:layout_row="1"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="8"
-            android:text="C" />
-
-        <Button
-            android:layout_column="3"
-            android:layout_row="1"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="9"
-            android:text="D" />
-
-        <Button
-            android:layout_column="4"
-            android:layout_row="1"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="10"
-            android:text="E" />
-
-        <Button
-            android:layout_column="5"
-            android:layout_row="1"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/btn_selection_letter_shape"
-            android:padding="8dp"
-            android:tag="11"
-            android:text="F" />
-
-        <Button
-            android:layout_column="6"
-            android:layout_row="1"
+            android:id="@+id/bonusA"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="4dp"
             android:background="@drawable/btn_bonus"
             android:padding="8dp"
+            android:layout_toEndOf="@+id/gridRandomLetter"
             android:text="G" />
 
-    </GridLayout>
+        <Button
+            android:id="@+id/bonusB"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="4dp"
+            android:background="@drawable/btn_bonus"
+            android:padding="8dp"
+            android:layout_toEndOf="@+id/gridRandomLetter"
+            android:layout_below="@+id/bonusA"
+            android:text="G" />
+
+    </RelativeLayout>
+
+
 
 </RelativeLayout>

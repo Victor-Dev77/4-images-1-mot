@@ -6,8 +6,6 @@ import android.os.Bundle
 import com.google.firebase.auth.FirebaseAuth
 import android.util.Log
 import android.util.TypedValue
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,7 +15,7 @@ import com.squareup.picasso.Picasso
 import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.models.User
 import android.view.ViewGroup
-import androidx.appcompat.app.ActionBar
+import android.graphics.drawable.ColorDrawable
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,6 +29,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var user: User
     private lateinit var actualLevel: Level
     private var word = ""
+    private lateinit var toolbarLevel: TextView
+    private lateinit var toolbarCoin: TextView
+    private lateinit var bonusABtn: Button
+    private lateinit var bonusBBtn: Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,10 +40,14 @@ class MainActivity : AppCompatActivity() {
         // remove status bar
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_main)
-        val actionBar = getSupportActionBar()
-        actionBar!!.setTitle("Niveau: 1")
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
+        toolbarLevel = findViewById(R.id.toolbar_level_tv)
+        toolbarCoin = findViewById(R.id.toolbar_coin_tv)
         imageLevel = findViewById(R.id.imageLevel)
+        bonusABtn = findViewById(R.id.bonusA)
+        bonusBBtn = findViewById(R.id.bonusB)
         auth = FirebaseAuth.getInstance()
         setup()
         setupCacheSize()
@@ -78,31 +84,6 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    //setting menu in action bar
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_toolbar,menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    // actions on click menu items
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.action_coin -> {
-            // User chose the "Print" item
-            Toast.makeText(this,"Coin action",Toast.LENGTH_LONG).show()
-            true
-        }
-        android.R.id.home ->{
-            Toast.makeText(this,"Home action",Toast.LENGTH_LONG).show()
-            true
-        }
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
-
     private fun setup() {
         // [START get_firestore_instance]
         db = FirebaseFirestore.getInstance()
@@ -127,18 +108,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun getAllLevels() {
         db.collection("levels")
+            .orderBy("levelNumber")
             .get()
             .addOnCanceledListener { Log.d("toto", "errerur loading data")}
             .addOnSuccessListener { result ->
                 for (document in result) {
                     val map = document.data
-                    val level = Level(document.id, map["image"] as String, map["word"] as String, map["difficulty"] as String)
+                    val level = Level(document.id, (map["levelNumber"] as Long).toInt(), map["image"] as String, map["word"] as String, map["difficulty"] as String)
                     listLevels.add(level)
                     Log.d("toto", "${document.id} => ${document.data}")
                 }
                 if (listLevels.size > 0) {
-
-                    Picasso.get().load(listLevels.first().image).into(imageLevel)
+                    loadImage(listLevels.first().image)
 
                     //DownloadImageTask(imageLevel)
                     //    .execute(listLevels.first().image)
@@ -154,17 +135,22 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    private fun loadImage(image: String) {
+        Picasso.get().load(image).into(imageLevel)
+    }
+
     private fun updateUI() {
         // Update Word
         linearWord = findViewById(R.id.linearResultWord)
+        linearWord.removeAllViews()
         (1..actualLevel.word.length).forEach {
             val view = createWordButton()
             linearWord.addView(view)
-            Log.d("toto", "ok")
         }
 
         // Update Random Letters
         gridLetters = findViewById(R.id.gridRandomLetter)
+        word = " ".repeat(actualLevel.word.length)
         val STRING_CHARACTERS = ('a'..'z').toList().toTypedArray()
         val letterArray : ArrayList<Char> = actualLevel.word.toList() as ArrayList<Char>
         Log.d("toto", "$letterArray")
@@ -175,15 +161,17 @@ class MainActivity : AppCompatActivity() {
 
         for (i in 0 until gridLetters.childCount) {
             val child = gridLetters.getChildAt(i) as Button
-            child.setOnClickListener {
-                when (i) {
-                    6 -> Log.d("toto", "Bonus en HAUT")
-                    13 -> Log.d("toto", "Bonus en BAS")
-                    else -> clickRandomLetter(it, i)
-                }
-            }
-            if (child.tag != null)
-                child.text = letterArray[(child.tag as String).toInt()].toString()
+            child.setOnClickListener { clickRandomLetter(it, i) }
+            child.text = letterArray[i].toString()
+        }
+
+        // init bonus
+        bonusABtn.setOnClickListener {
+            Log.d("toto", "Bonus en HAUT")
+        }
+
+        bonusBBtn.setOnClickListener {
+            Log.d("toto", "Bonus en BAS")
         }
     }
 
@@ -230,6 +218,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun insertRandomLetter(view: View, index: Int) {
+        var cmpt = 0
         for (i in 0 until linearWord.childCount) {
             var child = linearWord.getChildAt(i) as Button
             if (child.text == " ") {
@@ -237,14 +226,21 @@ class MainActivity : AppCompatActivity() {
                 gridLetters.addView(createLetterButton(), index)
                 val buttonLetter = view as Button
                 word = StringBuilder(word).replace(i, i + 1, buttonLetter.text.toString()).toString()
+                cmpt ++
                 Log.d("toto", "Word: $word - lenght: ${word.length}")
                 break
             }
+            else
+                cmpt ++
         }
-        if (verifyValidWord()) {
-            Log.d("toto", "MOT TROUVE !!!")
-        } else {
-            Log.d("toto", "MOT ERRONNE")
+        if (cmpt == actualLevel.word.length) {
+            if (verifyValidWord()) {
+                Log.d("toto", "MOT TROUVE !!!")
+                winLevel()
+            } else {
+                Log.d("toto", "MOT ERRONNE")
+                loseLevel()
+            }
         }
     }
 
@@ -254,7 +250,6 @@ class MainActivity : AppCompatActivity() {
         replaceView(view, viewWord)
         gridLetters.removeViewAt(index)
         gridLetters.addView(view, index)
-        Log.d("toto", "IndexLetter: $indexLetter")
         word = StringBuilder(word).replace(indexLetter, indexLetter + 1, " ").toString()
         Log.d("toto", "Word: $word - lenght: ${word.length}")
     }
@@ -279,6 +274,49 @@ class MainActivity : AppCompatActivity() {
         if (word.contains(' '))
             return false
         return word.trim().toLowerCase() == actualLevel.word.trim().toLowerCase()
+    }
+
+    private fun winLevel() {
+        toolbarCoin.text = (toolbarCoin.text.toString().toInt() + 100).toString()
+        if (listLevels.indexOf(actualLevel) + 1 < listLevels.size) {
+            val level = listLevels[listLevels.indexOf(actualLevel) + 1]
+            user.actualLevel = level.id
+            actualLevel = level
+            word = " ".repeat(level.word.length)
+            toolbarLevel.text = "Niveau ${level.levelNumber}"
+            loadImage(actualLevel.image)
+            nextLevelUILetters()
+            updateUI()
+
+        } else {
+            Log.d("toto", "JEU FINI !!!")
+            toolbarLevel.text = "JEU FINI !"
+        }
+    }
+
+    private fun loseLevel() {
+
+    }
+
+    private fun nextLevelUILetters() {
+        for (i in 0 until linearWord.childCount) {
+            val childWord = linearWord.getChildAt(i) as Button
+            if (childWord.text != " ") {
+                for (j in 0 until gridLetters.childCount) {
+                    val child = gridLetters.getChildAt(j) as Button
+                    val background = child.background
+                    if (background is ColorDrawable)
+                        if (background.color == Color.TRANSPARENT) {
+                            removeRandomLetter(childWord, j)
+                            break
+                        }
+                }
+            }
+
+
+        }
+
+
     }
 
 
