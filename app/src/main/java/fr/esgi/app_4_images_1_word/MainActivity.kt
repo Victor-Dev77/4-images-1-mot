@@ -178,8 +178,8 @@ class MainActivity : AppCompatActivity() {
     private fun createWordButton() : View {
         val view = Button(this)
         val params = LinearLayout.LayoutParams(
-            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f, resources.displayMetrics)).toInt(),
-            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f, resources.displayMetrics)).toInt()
+            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45f, resources.displayMetrics)).toInt(),
+            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45f, resources.displayMetrics)).toInt()
         )
         params.setMargins(4,4,4,4)
         view.layoutParams = params
@@ -192,8 +192,8 @@ class MainActivity : AppCompatActivity() {
     private fun createLetterButton() : View {
         val view = Button(this)
         val params = LinearLayout.LayoutParams(
-            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f, resources.displayMetrics)).toInt(),
-            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50f, resources.displayMetrics)).toInt()
+            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45f, resources.displayMetrics)).toInt(),
+            (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45f, resources.displayMetrics)).toInt()
         )
         params.setMargins(4,4,4,4)
         view.layoutParams = params
@@ -218,7 +218,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun insertRandomLetter(view: View, index: Int) {
-        var cmpt = 0
         for (i in 0 until linearWord.childCount) {
             var child = linearWord.getChildAt(i) as Button
             if (child.text == " ") {
@@ -226,14 +225,11 @@ class MainActivity : AppCompatActivity() {
                 gridLetters.addView(createLetterButton(), index)
                 val buttonLetter = view as Button
                 word = StringBuilder(word).replace(i, i + 1, buttonLetter.text.toString()).toString()
-                cmpt ++
                 Log.d("toto", "Word: $word - lenght: ${word.length}")
                 break
             }
-            else
-                cmpt ++
         }
-        if (cmpt == actualLevel.word.length) {
+        if (!(word.contains(' '))) {
             if (verifyValidWord()) {
                 Log.d("toto", "MOT TROUVE !!!")
                 winLevel()

@@ -78,9 +78,10 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearResultWord"
+        android:layout_centerInParent="true"
         android:layout_marginTop="16dp">
 
         <GridLayout
@@ -94,9 +95,9 @@
                 android:id="@+id/btn1"
                 android:layout_column="0"
                 android:layout_row="0"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="A" />
@@ -104,9 +105,9 @@
             <Button
                 android:layout_column="1"
                 android:layout_row="0"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="B" />
@@ -114,9 +115,9 @@
             <Button
                 android:layout_column="2"
                 android:layout_row="0"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="C" />
@@ -124,9 +125,9 @@
             <Button
                 android:layout_column="3"
                 android:layout_row="0"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="D" />
@@ -134,9 +135,9 @@
             <Button
                 android:layout_column="4"
                 android:layout_row="0"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="E" />
@@ -144,9 +145,9 @@
             <Button
                 android:layout_column="5"
                 android:layout_row="0"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="F" />
@@ -155,9 +156,9 @@
             <Button
                 android:layout_column="0"
                 android:layout_row="1"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="A" />
@@ -165,9 +166,9 @@
             <Button
                 android:layout_column="1"
                 android:layout_row="1"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="B" />
@@ -175,9 +176,9 @@
             <Button
                 android:layout_column="2"
                 android:layout_row="1"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="C" />
@@ -185,9 +186,9 @@
             <Button
                 android:layout_column="3"
                 android:layout_row="1"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="D" />
@@ -195,9 +196,9 @@
             <Button
                 android:layout_column="4"
                 android:layout_row="1"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="E" />
@@ -205,9 +206,9 @@
             <Button
                 android:layout_column="5"
                 android:layout_row="1"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="2dp"
                 android:background="@drawable/btn_selection_letter_shape"
                 android:padding="8dp"
                 android:text="F" />
@@ -216,9 +217,9 @@
 
         <Button
             android:id="@+id/bonusA"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_margin="2dp"
             android:background="@drawable/btn_bonus"
             android:padding="8dp"
             android:layout_toEndOf="@+id/gridRandomLetter"
@@ -226,9 +227,9 @@
 
         <Button
             android:id="@+id/bonusB"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="4dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_margin="2dp"
             android:background="@drawable/btn_bonus"
             android:padding="8dp"
             android:layout_toEndOf="@+id/gridRandomLetter"
