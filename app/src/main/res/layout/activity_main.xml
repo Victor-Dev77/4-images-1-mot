@@ -48,6 +48,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="0"
             android:text="A" />
 
         <Button
@@ -58,6 +59,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="1"
             android:text="B" />
 
         <Button
@@ -68,6 +70,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="2"
             android:text="C" />
 
         <Button
@@ -78,6 +81,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="3"
             android:text="D" />
 
         <Button
@@ -88,6 +92,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="4"
             android:text="E" />
 
         <Button
@@ -98,6 +103,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="5"
             android:text="F" />
 
         <Button
@@ -120,6 +126,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="6"
             android:text="A" />
 
         <Button
@@ -130,6 +137,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="7"
             android:text="B" />
 
         <Button
@@ -140,6 +148,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="8"
             android:text="C" />
 
         <Button
@@ -150,6 +159,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="9"
             android:text="D" />
 
         <Button
@@ -160,6 +170,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="10"
             android:text="E" />
 
         <Button
@@ -170,6 +181,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_selection_letter_shape"
             android:padding="8dp"
+            android:tag="11"
             android:text="F" />
 
         <Button

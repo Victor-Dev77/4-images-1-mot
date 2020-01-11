@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val actionBar = getSupportActionBar()
         actionBar!!.setTitle("Niveau: 1")
+
         imageLevel = findViewById(R.id.imageLevel)
         auth = FirebaseAuth.getInstance()
         setup()
@@ -167,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         val STRING_CHARACTERS = ('a'..'z').toList().toTypedArray()
         val letterArray : ArrayList<Char> = actualLevel.word.toList() as ArrayList<Char>
         Log.d("toto", "$letterArray")
-        (0..(12 - actualLevel.word.length)).forEach {
+        (0 until (12 - actualLevel.word.length)).forEach {
             letterArray.add(STRING_CHARACTERS.random())
         }
         letterArray.shuffle()
@@ -181,8 +182,8 @@ class MainActivity : AppCompatActivity() {
                     else -> clickRandomLetter(it, i)
                 }
             }
-            if (i != 6 && i != 13)
-                child.text = letterArray[i].toString()
+            if (child.tag != null)
+                child.text = letterArray[(child.tag as String).toInt()].toString()
         }
     }
 
