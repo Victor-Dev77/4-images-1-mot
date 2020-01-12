@@ -215,26 +215,30 @@
 
         </GridLayout>
 
-        <Button
+        <ImageButton
             android:id="@+id/bonusA"
             android:layout_width="45dp"
             android:layout_height="45dp"
-            android:layout_margin="2dp"
+            android:src="@drawable/bonus_letter_word"
             android:background="@drawable/btn_bonus"
-            android:padding="8dp"
             android:layout_toEndOf="@+id/gridRandomLetter"
-            android:text="G" />
+            android:padding="10dp"
+            android:layout_margin="2dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true" />
 
-        <Button
+        <ImageButton
             android:id="@+id/bonusB"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_margin="2dp"
             android:background="@drawable/btn_bonus"
-            android:padding="8dp"
+            android:padding="10dp"
             android:layout_toEndOf="@+id/gridRandomLetter"
             android:layout_below="@+id/bonusA"
-            android:text="G" />
+            android:src="@drawable/bonus_letter_remove"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"/>
 
     </RelativeLayout>
 

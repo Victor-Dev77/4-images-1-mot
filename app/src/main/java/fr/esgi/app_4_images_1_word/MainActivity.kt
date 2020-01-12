@@ -31,8 +31,8 @@ class MainActivity : AppCompatActivity() {
     private var word = ""
     private lateinit var toolbarLevel: TextView
     private lateinit var toolbarCoin: TextView
-    private lateinit var bonusABtn: Button
-    private lateinit var bonusBBtn: Button
+    private lateinit var bonusABtn: ImageButton
+    private lateinit var bonusBBtn: ImageButton
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
         if (currentUser != null)
-            user = User(currentUser.uid, currentUser.displayName as String, 0, "")
+            user = User(currentUser.uid, currentUser.displayName as String, 400, "")
         //updateUI(currentUser)
         Log.d("toto", "user: ${currentUser}")
 
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("toto", "signInAnonymously:success")
-                    this.user = User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 0, "")
+                    this.user = User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 400, "")
                     Log.d("toto", "user: ${auth.currentUser!!.isAnonymous}")
                    // updateUI(user)
                 } else {
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                     user.actualLevel = listLevels.first().id
                     actualLevel = listLevels.first()
                     word = " ".repeat(listLevels.first().word.length)
-                    updateUI()
+                    initUI()
                 }
 
             }
@@ -139,7 +139,9 @@ class MainActivity : AppCompatActivity() {
         Picasso.get().load(image).into(imageLevel)
     }
 
-    private fun updateUI() {
+    private fun initUI() {
+        toolbarCoin.text = "${user.nbCoin}"
+
         // Update Word
         linearWord = findViewById(R.id.linearResultWord)
         linearWord.removeAllViews()
@@ -168,6 +170,7 @@ class MainActivity : AppCompatActivity() {
         // init bonus
         bonusABtn.setOnClickListener {
             Log.d("toto", "Bonus en HAUT")
+            bonusAddLetter()
         }
 
         bonusBBtn.setOnClickListener {
@@ -229,15 +232,7 @@ class MainActivity : AppCompatActivity() {
                 break
             }
         }
-        if (!(word.contains(' '))) {
-            if (verifyValidWord()) {
-                Log.d("toto", "MOT TROUVE !!!")
-                winLevel()
-            } else {
-                Log.d("toto", "MOT ERRONNE")
-                loseLevel()
-            }
-        }
+        verifyEndLevel()
     }
 
     private fun removeRandomLetter(view: View, index: Int) {
@@ -258,6 +253,7 @@ class MainActivity : AppCompatActivity() {
     private fun replaceView(currentView: View, newView: View) {
         val parent = currentView.parent as? ViewGroup
         val index = parent?.indexOfChild(currentView)
+        Log.d("toto", "index replace $index")
         if (index != null) {
             removeView(currentView)
             removeView(newView)
@@ -265,6 +261,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun verifyEndLevel() {
+        if (!(word.contains(' '))) {
+            if (verifyValidWord()) {
+                Log.d("toto", "MOT TROUVE !!!")
+                winLevel()
+            } else {
+                Log.d("toto", "MOT ERRONNE")
+                loseLevel()
+            }
+        }
+    }
 
     private fun verifyValidWord() : Boolean {
         if (word.contains(' '))
@@ -273,7 +280,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun winLevel() {
-        toolbarCoin.text = (toolbarCoin.text.toString().toInt() + 100).toString()
+        user.nbCoin += 100
+        toolbarCoin.text = "${user.nbCoin}"
         if (listLevels.indexOf(actualLevel) + 1 < listLevels.size) {
             val level = listLevels[listLevels.indexOf(actualLevel) + 1]
             user.actualLevel = level.id
@@ -282,7 +290,7 @@ class MainActivity : AppCompatActivity() {
             toolbarLevel.text = "Niveau ${level.levelNumber}"
             loadImage(actualLevel.image)
             nextLevelUILetters()
-            updateUI()
+            initUI()
 
         } else {
             Log.d("toto", "JEU FINI !!!")
@@ -315,5 +323,138 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun bonusAddLetter() {
+        if (user.nbCoin - 60 < 0) {
+            Toast.makeText(this, "Pas assez de pièces !", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!(word.contains(' '))) {
+            Toast.makeText(this, "Enlever une lettre pour utiliser le bonus", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val arrayIndex = getMissingPositionWord(word)
+        val newIndex = (arrayIndex.indices).random()
+        val newChar = actualLevel.word[arrayIndex[newIndex]]
+        Log.d("toto", "new Char -> $newChar")
+        arrayIndex.forEach {
+            Log.d("toto", "index array: $it")
+        }
+
+        // update UI
+        insertLetterWithBonus(newChar, arrayIndex[newIndex])
+
+        verifyEndLevel()
+    }
+
+
+    private fun getMissingPositionWord(word: String) : Array<Int> {
+        if (!(word.contains(' ')))
+            return ArrayList<Int>().toTypedArray()
+        val array = ArrayList<Int>()
+        for (i in word.indices) {
+            if (word[i] == ' ') { // CAS 2 || word[i] != actualLevel.word[i]) {
+                array.add(i)
+            }
+        }
+        return array.toTypedArray()
+    }
+
+    private fun insertLetterWithBonus(letter: Char, index: Int) {
+        val childWord = linearWord.getChildAt(index) as Button
+        var find = false
+        for (i in 0 until gridLetters.childCount) {
+            val childLetter = gridLetters.getChildAt(i) as Button
+            if (childLetter.text == "$letter") {
+                replaceView(childWord, childLetter)
+                gridLetters.addView(createLetterButton(), i)
+                word = StringBuilder(word).replace(index, index + 1, "$letter").toString()
+                Log.d("toto", "word bonus => $word")
+                find = true
+                break
+            }
+        }
+        // lettre pas dans grille donc cherche dans mot => lettre dans mot pas bonne place
+        if (!find) {
+            for (i in 0 until linearWord.childCount) {
+                val childLetter = linearWord.getChildAt(i) as Button
+                // CAS N1: si lettre index == vide && lettre i == lettre =>
+                // => remplace word index ' ' par lettre + remplace i lettre par ' '
+                // CAS N2: lettre index == autre lettre && lettre i == lettre =>
+                // => save word index autre lettre + remplace word index autre lettre par lettre
+                // + remplace i lettre par ' ' + mettre index autre lettre dans grid
+
+                // CAS 1
+                if (childWord.text == " " && childLetter.text == "$letter") {
+                    //replaceViewBonusCas1(childWord, childLetter)
+                    //linearWord.addView(createWordButton(), i)
+                    word = StringBuilder(word).replace(index, index + 1, "$letter").toString()
+                    word = StringBuilder(word).replace(i, i + 1, " ").toString()
+                    replaceViewBonusCas1Bis(word)
+                    Log.d("toto", "not find CAS 1 word bonus => $word")
+                    break
+                }
+
+                // CAS 2
+               /* else if (childWord.text != " " && childLetter.text == "$letter") {
+                    replaceViewBonusCas2(childWord, childLetter)
+                    linearWord.addView(createWordButton(), i)
+                    word = StringBuilder(word).replace(index, index + 1, "$letter").toString()
+                    word = StringBuilder(word).replace(i, i + 1, " ").toString()
+                    Log.d("toto", "not find CAS 2 word bonus => $word")
+                    break
+                }*/
+            }
+        }
+    }
+
+    private fun replaceViewBonusCas1Bis(word: String) {
+        val array = ArrayList<Button>()
+        for (i in 0 until linearWord.childCount) {
+            val child = linearWord.getChildAt(i) as Button
+            array.add(child)
+        }
+        linearWord.removeAllViews()
+        word.forEach {
+            if (it == ' ')
+                linearWord.addView(createWordButton())
+            else {
+                val res = array.find { value -> value.text == "$it" }
+                array.remove(res)
+                linearWord.addView(res)
+            }
+        }
+    }
+
+    private fun replaceViewBonusCas1(currentView: View, newView: View) {
+        val parent = currentView.parent as? ViewGroup
+        val index = parent?.indexOfChild(currentView)
+        Log.d("toto", "index replace $index")
+        if (index != null) {
+            removeView(currentView)
+            removeView(newView)
+            parent.addView(newView, index )
+        }
+    }
+
+    private fun replaceViewBonusCas2(currentView: View, newView: View) {
+        val parent = currentView.parent as? ViewGroup
+        val index = parent?.indexOfChild(currentView)
+        Log.d("toto", "index replace $index")
+        if (index != null) {
+            removeView(currentView)
+            removeView(newView)
+            parent.addView(newView, index )
+            for (i in 0 until gridLetters.childCount) {
+                val child = gridLetters.getChildAt(i) as Button
+                val background = child.background
+                if (background is ColorDrawable)
+                    if (background.color == Color.TRANSPARENT) {
+                        gridLetters.removeViewAt(i)
+                        gridLetters.addView(currentView, i)
+                        break
+                    }
+            }
+        }
+    }
 
 }
