@@ -175,6 +175,7 @@ class MainActivity : AppCompatActivity() {
 
         bonusBBtn.setOnClickListener {
             Log.d("toto", "Bonus en BAS")
+            bonusDeleteLetter()
         }
     }
 
@@ -192,7 +193,7 @@ class MainActivity : AppCompatActivity() {
         return view
     }
 
-    private fun createLetterButton() : View {
+    private fun createLetterButton(string: String) : View {
         val view = Button(this)
         val params = LinearLayout.LayoutParams(
             (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45f, resources.displayMetrics)).toInt(),
@@ -201,10 +202,12 @@ class MainActivity : AppCompatActivity() {
         params.setMargins(4,4,4,4)
         view.layoutParams = params
         view.setBackgroundResource(R.drawable.btn_selection_letter_shape)
-        view.setBackgroundColor(Color.TRANSPARENT)
-        view.isEnabled = false
+        if (string == " ") {
+            view.setBackgroundColor(Color.TRANSPARENT)
+            view.isEnabled = false
+        }
         view.setPadding(8)
-        view.text = " " // const final NULL_TEXT
+        view.text = string // const final NULL_TEXT
         return view
     }
 
@@ -225,7 +228,7 @@ class MainActivity : AppCompatActivity() {
             var child = linearWord.getChildAt(i) as Button
             if (child.text == " ") {
                 replaceView(child, view)
-                gridLetters.addView(createLetterButton(), index)
+                gridLetters.addView(createLetterButton(" "), index)
                 val buttonLetter = view as Button
                 word = StringBuilder(word).replace(i, i + 1, buttonLetter.text.toString()).toString()
                 Log.d("toto", "Word: $word - lenght: ${word.length}")
@@ -303,6 +306,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun nextLevelUILetters() {
+        // Re init transparent button (with bonus)
+        for (i in 0 until gridLetters.childCount) {
+            val childGrid = gridLetters.getChildAt(i) as Button
+            if (childGrid.text == " ") {
+                replaceView(childGrid, createLetterButton("a"))
+            }
+        }
         for (i in 0 until linearWord.childCount) {
             val childWord = linearWord.getChildAt(i) as Button
             if (childWord.text != " ") {
@@ -316,15 +326,11 @@ class MainActivity : AppCompatActivity() {
                         }
                 }
             }
-
-
         }
-
-
     }
 
     private fun bonusAddLetter() {
-        if (user.nbCoin - 60 < 0) {
+        if (user.nbCoin - 80 < 0) {
             Toast.makeText(this, "Pas assez de pièces !", Toast.LENGTH_SHORT).show()
             return
         }
@@ -366,7 +372,7 @@ class MainActivity : AppCompatActivity() {
             val childLetter = gridLetters.getChildAt(i) as Button
             if (childLetter.text == "$letter") {
                 replaceView(childWord, childLetter)
-                gridLetters.addView(createLetterButton(), i)
+                gridLetters.addView(createLetterButton(" "), i)
                 word = StringBuilder(word).replace(index, index + 1, "$letter").toString()
                 Log.d("toto", "word bonus => $word")
                 find = true
@@ -455,6 +461,45 @@ class MainActivity : AppCompatActivity() {
                     }
             }
         }
+    }
+
+
+    private fun bonusDeleteLetter() {
+        if (user.nbCoin - 60 < 0) {
+            Toast.makeText(this, "Pas assez de pièces !", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!(word.contains(' '))) {
+            Toast.makeText(this, "Enlever une lettre pour utiliser le bonus", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val arrayIndex = getMissingPositionLettersGrid()
+        if (arrayIndex.isEmpty()) {
+            Toast.makeText(this, "Toutes les lettres sont supprimées", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val newIndex = (arrayIndex.keys).random()
+        Log.d("toto", "array: $arrayIndex, index: $newIndex")
+        bonusRemoveLetter(arrayIndex[newIndex]!!, newIndex)
+        user.nbCoin -= 60
+        toolbarCoin.text = "${user.nbCoin}"
+    }
+
+    private fun getMissingPositionLettersGrid() : MutableMap<Int, Button> {
+        val array : MutableMap<Int, Button> = mutableMapOf()
+        for (i in 0 until gridLetters.childCount) {
+            val child = gridLetters.getChildAt(i) as Button
+            if (child.text != " " && !(actualLevel.word.contains(child.text))) {
+                array[i] = child
+            }
+        }
+        return array
+    }
+
+    private fun bonusRemoveLetter(view: View, index: Int) {
+        val viewWord = createLetterButton(" ")
+        replaceView(view, viewWord)
+
     }
 
 }
