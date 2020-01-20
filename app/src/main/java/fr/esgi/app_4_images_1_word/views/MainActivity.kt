@@ -1,4 +1,4 @@
-package fr.esgi.app_4_images_1_word
+package fr.esgi.app_4_images_1_word.views
 
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -16,23 +16,29 @@ import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.models.User
 import android.view.ViewGroup
 import android.graphics.drawable.ColorDrawable
+import fr.esgi.app_4_images_1_word.R
+import fr.esgi.app_4_images_1_word.controllers.FirebaseAuthHelper
+import fr.esgi.app_4_images_1_word.controllers.FirebaseFirestoreHelper
+import fr.esgi.app_4_images_1_word.controllers.LevelController
+import fr.esgi.app_4_images_1_word.controllers.UserController
 
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+    // Variable UI
+    private lateinit var toolbarLevel: TextView
+    private lateinit var toolbarCoin: TextView
     private lateinit var imageLevel: ImageView
     private lateinit var linearWord: LinearLayout
     private lateinit var gridLetters: GridLayout
-    private val listLevels = ArrayList<Level>()
-    private lateinit var user: User
-    private lateinit var actualLevel: Level
-    private var word = ""
-    private lateinit var toolbarLevel: TextView
-    private lateinit var toolbarCoin: TextView
     private lateinit var bonusABtn: ImageButton
     private lateinit var bonusBBtn: ImageButton
+
+    // Variable Controller
+    private var userController = UserController()
+    private lateinit var levelController: LevelController
+    private lateinit var firebaseAuthHelper: FirebaseAuthHelper
+    private lateinit var firebaseFirestoreHelper: FirebaseFirestoreHelper
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,127 +46,46 @@ class MainActivity : AppCompatActivity() {
         // remove status bar
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_main)
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        initView()
 
-        toolbarLevel = findViewById(R.id.toolbar_level_tv)
-        toolbarCoin = findViewById(R.id.toolbar_coin_tv)
-        imageLevel = findViewById(R.id.imageLevel)
-        bonusABtn = findViewById(R.id.bonusA)
-        bonusBBtn = findViewById(R.id.bonusB)
-        auth = FirebaseAuth.getInstance()
-        setup()
-        setupCacheSize()
-        getAllLevels()
+        levelController = LevelController(userController, this)
+        firebaseAuthHelper = FirebaseAuthHelper(this, userController)
+        firebaseFirestoreHelper = FirebaseFirestoreHelper(this, levelController, userController)
     }
 
     public override fun onStart() {
         super.onStart()
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        if (currentUser != null)
-            user = User(currentUser.uid, currentUser.displayName as String, 400, "")
-        //updateUI(currentUser)
-        Log.d("toto", "user: ${currentUser}")
-
-        auth.signInAnonymously()
-            .addOnFailureListener { res -> Log.d("toto", "NOP NOP")}
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d("toto", "signInAnonymously:success")
-                    this.user = User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 400, "")
-                    Log.d("toto", "user: ${auth.currentUser!!.isAnonymous}")
-                   // updateUI(user)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.d("toto", "signInAnonymously:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                    //updateUI(null)
-                }
-
-                // ...
-            }
+        firebaseAuthHelper.signIn()
     }
 
-    private fun setup() {
-        // [START get_firestore_instance]
-        db = FirebaseFirestore.getInstance()
-        // [END get_firestore_instance]
-
-        // [START set_firestore_settings]
-        val settings = FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(true)
-            .build()
-        db.firestoreSettings = settings
-        // [END set_firestore_settings]
+    private fun initView() {
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        toolbarLevel = findViewById(R.id.toolbar_level_tv)
+        toolbarCoin = findViewById(R.id.toolbar_coin_tv)
+        imageLevel = findViewById(R.id.imageLevel)
+        linearWord = findViewById(R.id.linearResultWord)
+        gridLetters = findViewById(R.id.gridRandomLetter)
+        bonusABtn = findViewById(R.id.bonusA)
+        bonusBBtn = findViewById(R.id.bonusB)
     }
 
-    private fun setupCacheSize() {
-        // [START fs_setup_cache]
-        val settings = FirebaseFirestoreSettings.Builder()
-            .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-            .build()
-        db.firestoreSettings = settings
-        // [END fs_setup_cache]
-    }
-
-    private fun getAllLevels() {
-        db.collection("levels")
-            .orderBy("levelNumber")
-            .get()
-            .addOnCanceledListener { Log.d("toto", "errerur loading data")}
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    val map = document.data
-                    val level = Level(document.id, (map["levelNumber"] as Long).toInt(), map["image"] as String, map["word"] as String, map["difficulty"] as String)
-                    listLevels.add(level)
-                    Log.d("toto", "${document.id} => ${document.data}")
-                }
-                if (listLevels.size > 0) {
-                    loadImage(listLevels.first().image)
-
-                    //DownloadImageTask(imageLevel)
-                    //    .execute(listLevels.first().image)
-                    user.actualLevel = listLevels.first().id
-                    actualLevel = listLevels.first()
-                    word = " ".repeat(listLevels.first().word.length)
-                    initUI()
-                }
-
-            }
-            .addOnFailureListener { exception ->
-                Log.d("toto", "Error getting documents: ", exception)
-            }
-    }
-
-    private fun loadImage(image: String) {
+    fun loadImage(image: String) {
         Picasso.get().load(image).into(imageLevel)
     }
 
-    private fun initUI() {
-        toolbarCoin.text = "${user.nbCoin}"
-
+    fun initUI() {
+        toolbarCoin.text = "${userController.getCoin()}"
+        val actualWord = levelController.getActualLevel().getWord()
         // Update Word
-        linearWord = findViewById(R.id.linearResultWord)
         linearWord.removeAllViews()
-        (1..actualLevel.word.length).forEach {
+        (1..actualWord.length).forEach {
             val view = createWordButton()
             linearWord.addView(view)
         }
 
         // Update Random Letters
-        gridLetters = findViewById(R.id.gridRandomLetter)
-        word = " ".repeat(actualLevel.word.length)
-        val STRING_CHARACTERS = ('a'..'z').toList().toTypedArray()
-        val letterArray : ArrayList<Char> = actualLevel.word.toList() as ArrayList<Char>
-        Log.d("toto", "$letterArray")
-        (0 until (12 - actualLevel.word.length)).forEach {
-            letterArray.add(STRING_CHARACTERS.random())
-        }
-        letterArray.shuffle()
-
+        val letterArray = levelController.randomLetterList()
         for (i in 0 until gridLetters.childCount) {
             val child = gridLetters.getChildAt(i) as Button
             child.setOnClickListener { clickRandomLetter(it, i) }
@@ -177,6 +102,10 @@ class MainActivity : AppCompatActivity() {
             Log.d("toto", "Bonus en BAS")
             bonusDeleteLetter()
         }
+    }
+
+    fun updateCoin() {
+        toolbarCoin.text = "${userController.getCoin()}"
     }
 
     private fun createWordButton() : View {
@@ -218,7 +147,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.gridRandomLetter -> insertRandomLetter(view, index)
                 R.id.linearResultWord -> removeRandomLetter(view, index)
             }
-
            // view.isEnabled = !view.isEnabled
         }
     }
@@ -230,12 +158,12 @@ class MainActivity : AppCompatActivity() {
                 replaceView(child, view)
                 gridLetters.addView(createLetterButton(" "), index)
                 val buttonLetter = view as Button
-                word = StringBuilder(word).replace(i, i + 1, buttonLetter.text.toString()).toString()
-                Log.d("toto", "Word: $word - lenght: ${word.length}")
+                levelController.setWordTemp(i, buttonLetter.text.toString())
+                Log.d("toto", "Word: ${levelController.getWordTemp()} - lenght: ${levelController.getWordTemp().length}")
                 break
             }
         }
-        verifyEndLevel()
+        levelController.verifyEndLevel()
     }
 
     private fun removeRandomLetter(view: View, index: Int) {
@@ -244,8 +172,8 @@ class MainActivity : AppCompatActivity() {
         replaceView(view, viewWord)
         gridLetters.removeViewAt(index)
         gridLetters.addView(view, index)
-        word = StringBuilder(word).replace(indexLetter, indexLetter + 1, " ").toString()
-        Log.d("toto", "Word: $word - lenght: ${word.length}")
+        levelController.setWordTemp(indexLetter, " ")
+        Log.d("toto", "Word: ${levelController.getWordTemp()} - lenght: ${levelController.getWordTemp().length}")
     }
 
     private fun removeView(view: View) {
@@ -264,45 +192,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun verifyEndLevel() {
-        if (!(word.contains(' '))) {
-            if (verifyValidWord()) {
-                Log.d("toto", "MOT TROUVE !!!")
-                winLevel()
-            } else {
-                Log.d("toto", "MOT ERRONNE")
-                loseLevel()
-            }
-        }
+    fun winLevel() {
+        toolbarCoin.text = "${userController.getCoin()}"
+        toolbarLevel.text = "Niveau ${levelController.getActualLevel().getLevelNumber()}"
+        loadImage(levelController.getActualLevel().getImage())
+        nextLevelUILetters()
+        initUI()
     }
 
-    private fun verifyValidWord() : Boolean {
-        if (word.contains(' '))
-            return false
-        return word.trim().toLowerCase() == actualLevel.word.trim().toLowerCase()
+    fun loseLevel() {
+
     }
 
-    private fun winLevel() {
-        user.nbCoin += 100
-        toolbarCoin.text = "${user.nbCoin}"
-        if (listLevels.indexOf(actualLevel) + 1 < listLevels.size) {
-            val level = listLevels[listLevels.indexOf(actualLevel) + 1]
-            user.actualLevel = level.id
-            actualLevel = level
-            word = " ".repeat(level.word.length)
-            toolbarLevel.text = "Niveau ${level.levelNumber}"
-            loadImage(actualLevel.image)
-            nextLevelUILetters()
-            initUI()
-
-        } else {
-            Log.d("toto", "JEU FINI !!!")
-            toolbarLevel.text = "JEU FINI !"
-        }
-    }
-
-    private fun loseLevel() {
-
+    fun finishGame() {
+        toolbarLevel.text = "JEU FINI !"
     }
 
     private fun nextLevelUILetters() {
@@ -330,42 +233,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bonusAddLetter() {
-        if (user.nbCoin - 80 < 0) {
-            Toast.makeText(this, "Pas assez de pièces !", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (!(word.contains(' '))) {
-            Toast.makeText(this, "Enlever une lettre pour utiliser le bonus", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val arrayIndex = getMissingPositionWord(word)
-        val newIndex = (arrayIndex.indices).random()
-        val newChar = actualLevel.word[arrayIndex[newIndex]]
-        Log.d("toto", "new Char -> $newChar")
-        arrayIndex.forEach {
-            Log.d("toto", "index array: $it")
-        }
+        levelController.bonusAddLetter()
+    }
 
-        // update UI
-        insertLetterWithBonus(newChar, arrayIndex[newIndex])
-
-        verifyEndLevel()
+    fun alert(string: String) {
+        Toast.makeText(this, string, Toast.LENGTH_SHORT).show()
     }
 
 
-    private fun getMissingPositionWord(word: String) : Array<Int> {
-        if (!(word.contains(' ')))
-            return ArrayList<Int>().toTypedArray()
-        val array = ArrayList<Int>()
-        for (i in word.indices) {
-            if (word[i] == ' ') { // CAS 2 || word[i] != actualLevel.word[i]) {
-                array.add(i)
-            }
-        }
-        return array.toTypedArray()
-    }
-
-    private fun insertLetterWithBonus(letter: Char, index: Int) {
+     fun insertLetterWithBonus(letter: Char, index: Int) {
         val childWord = linearWord.getChildAt(index) as Button
         var find = false
         for (i in 0 until gridLetters.childCount) {
@@ -373,8 +249,7 @@ class MainActivity : AppCompatActivity() {
             if (childLetter.text == "$letter") {
                 replaceView(childWord, childLetter)
                 gridLetters.addView(createLetterButton(" "), i)
-                word = StringBuilder(word).replace(index, index + 1, "$letter").toString()
-                Log.d("toto", "word bonus => $word")
+                levelController.setWordTemp(index, "$letter")
                 find = true
                 break
             }
@@ -393,10 +268,9 @@ class MainActivity : AppCompatActivity() {
                 if (childWord.text == " " && childLetter.text == "$letter") {
                     //replaceViewBonusCas1(childWord, childLetter)
                     //linearWord.addView(createWordButton(), i)
-                    word = StringBuilder(word).replace(index, index + 1, "$letter").toString()
-                    word = StringBuilder(word).replace(i, i + 1, " ").toString()
-                    replaceViewBonusCas1Bis(word)
-                    Log.d("toto", "not find CAS 1 word bonus => $word")
+                    levelController.setWordTemp(index, "$letter")
+                    levelController.setWordTemp(i, " ")
+                    replaceViewBonusCas1Bis(levelController.getWordTemp())
                     break
                 }
 
@@ -465,41 +339,23 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun bonusDeleteLetter() {
-        if (user.nbCoin - 60 < 0) {
-            Toast.makeText(this, "Pas assez de pièces !", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (!(word.contains(' '))) {
-            Toast.makeText(this, "Enlever une lettre pour utiliser le bonus", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val arrayIndex = getMissingPositionLettersGrid()
-        if (arrayIndex.isEmpty()) {
-            Toast.makeText(this, "Toutes les lettres sont supprimées", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val newIndex = (arrayIndex.keys).random()
-        Log.d("toto", "array: $arrayIndex, index: $newIndex")
-        bonusRemoveLetter(arrayIndex[newIndex]!!, newIndex)
-        user.nbCoin -= 60
-        toolbarCoin.text = "${user.nbCoin}"
+        levelController.bonusDeleteLetter()
     }
 
-    private fun getMissingPositionLettersGrid() : MutableMap<Int, Button> {
+     fun getMissingPositionLettersGrid() : MutableMap<Int, Button> {
         val array : MutableMap<Int, Button> = mutableMapOf()
         for (i in 0 until gridLetters.childCount) {
             val child = gridLetters.getChildAt(i) as Button
-            if (child.text != " " && !(actualLevel.word.contains(child.text))) {
+            if (child.text != " " && !(levelController.getActualLevel().getWord().contains(child.text))) {
                 array[i] = child
             }
         }
         return array
     }
 
-    private fun bonusRemoveLetter(view: View, index: Int) {
+     fun bonusRemoveLetter(view: View, index: Int) {
         val viewWord = createLetterButton(" ")
         replaceView(view, viewWord)
-
     }
 
 }

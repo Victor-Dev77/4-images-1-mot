@@ -1,3 +1,25 @@
 package fr.esgi.app_4_images_1_word.models
 
-data class Level (val id: String, val levelNumber: Int, val image: String, val word: String, val difficulty: String)
+class Level (private val id: String, private val levelNumber: Int, private val image: String, private val word: String, private val difficulty: String) {
+
+    fun getID() : String {
+        return id
+    }
+
+    fun getLevelNumber() : Int {
+        return levelNumber
+    }
+
+    fun getImage() : String {
+        return image
+    }
+
+    fun getWord() : String {
+        return word
+    }
+
+    fun getDifficulty() : String {
+        return difficulty
+    }
+
+}
