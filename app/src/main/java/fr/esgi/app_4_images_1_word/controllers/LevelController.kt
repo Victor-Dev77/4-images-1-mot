@@ -10,6 +10,11 @@ class LevelController(private val user: UserController, private val view: MainAc
     private lateinit var actualLevel: Level
     private val listLevels = ArrayList<Level>()
     private var wordTemp = ""
+    private var firestore = FirebaseFirestoreHelper(view, this, user)
+
+    fun setFirestore(firestore: FirebaseFirestoreHelper) {
+        this.firestore = firestore
+    }
 
 
     fun addLevel(level: Level) {
@@ -85,9 +90,10 @@ class LevelController(private val user: UserController, private val view: MainAc
         user.increaseCoin(100)
         if (listLevels.indexOf(actualLevel) + 1 < listLevels.size) {
             val level = listLevels[listLevels.indexOf(actualLevel) + 1]
-            user.setActualLevel(level.getID())
+            user.setActualLevel(level.getLevelNumber())
             actualLevel = level
             wordTemp = " ".repeat(level.getWord().length)
+            firestore.saveLevel(user.getUser())
             return true
 
         } else {

@@ -50,7 +50,9 @@ class MainActivity : AppCompatActivity() {
 
         levelController = LevelController(userController, this)
         firebaseFirestoreHelper = FirebaseFirestoreHelper(this, levelController, userController)
+        firebaseFirestoreHelper.initFirestore()
         firebaseAuthHelper = FirebaseAuthHelper(this, firebaseFirestoreHelper, userController)
+        levelController.setFirestore(firebaseFirestoreHelper)
 
     }
 
@@ -76,6 +78,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun initUI() {
+        toolbarLevel.text = "Niveau ${userController.getActualLevel()}"
         toolbarCoin.text = "${userController.getCoin()}"
         val actualWord = levelController.getActualLevel().getWord()
         // Update Word

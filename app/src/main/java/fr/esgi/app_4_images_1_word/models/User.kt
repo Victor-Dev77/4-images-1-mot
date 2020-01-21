@@ -1,6 +1,6 @@
 package fr.esgi.app_4_images_1_word.models
 
-class User (private var id: String, private var pseudo: String, private var nbCoin: Int, private var actualLevel: String) {
+class User (private var id: String, private var pseudo: String, private var nbCoin: Int, private var actualLevel: Int) {
 
     fun getID(): String {
         return id
@@ -26,14 +26,17 @@ class User (private var id: String, private var pseudo: String, private var nbCo
         nbCoin = number
     }
 
-    fun getActualLevel(): String {
+    fun getActualLevel(): Int {
         return actualLevel
     }
 
-    fun setActualLevel(level: String) {
+    fun setActualLevel(level: Int) {
         actualLevel = level
     }
 
+    fun getUser() : User {
+        return User(id, pseudo, nbCoin, actualLevel)
+    }
 
 }
 

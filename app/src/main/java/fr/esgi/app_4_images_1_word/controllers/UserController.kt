@@ -4,7 +4,7 @@ import fr.esgi.app_4_images_1_word.models.User
 
 class UserController {
 
-    private val user = User("id", "pseudo", 0, "level")
+    private val user = User("id", "pseudo", 0, 1)
 
     fun setUser(user: User) {
         this.user.setID(user.getID())
@@ -25,8 +25,15 @@ class UserController {
         user.setNbCoin(user.getNbCoin() - coins)
     }
 
-    fun setActualLevel(level: String) {
+    fun setActualLevel(level: Int) {
         user.setActualLevel(level)
     }
 
+    fun getActualLevel() : Int {
+        return user.getActualLevel()
+    }
+
+    fun getUser() : User {
+        return user.getUser()
+    }
 }

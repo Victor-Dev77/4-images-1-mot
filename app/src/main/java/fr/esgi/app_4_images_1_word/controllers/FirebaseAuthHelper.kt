@@ -17,27 +17,27 @@ class FirebaseAuthHelper(private val view: MainActivity, private val firestore: 
         val currentUser = auth.currentUser
         if (currentUser != null) {
             // Get USER INFO FIRESTORE
-            val user = User(currentUser.uid, currentUser.displayName as String, 400, "")
+            val user = User(currentUser.uid, currentUser.displayName as String, 400, 1)
             firestore.getUserInfo(user)
-            return
             //userController.setUser(User(currentUser.uid, currentUser.displayName as String, 400, ""))
-
+            return
         }
         //updateUI(currentUser)
         Log.d("toto", "user: ${currentUser}")
         view.updateCoin()
-
         auth.signInAnonymously()
             .addOnFailureListener { res -> Log.d("toto", "NOP NOP")}
             .addOnCompleteListener(view) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("toto", "signInAnonymously:success")
-                    val user = User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 400, "")
+                    val user = User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 400, 1)
                     firestore.setUser(user)
+                    firestore.getAllLevels()
                     // userController.setUser()
                     Log.d("toto", "user: ${auth.currentUser!!.isAnonymous}")
                     view.updateCoin()
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.d("toto", "signInAnonymously:failure", task.exception)

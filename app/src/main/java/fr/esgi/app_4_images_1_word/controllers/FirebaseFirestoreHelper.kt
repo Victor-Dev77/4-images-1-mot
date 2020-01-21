@@ -8,14 +8,13 @@ import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.models.User
 import fr.esgi.app_4_images_1_word.views.MainActivity
 
-class FirebaseFirestoreHelper(private val view: MainActivity, private val levelController: LevelController, private val user: UserController) {
+class FirebaseFirestoreHelper(private val view: MainActivity, private val levelController: LevelController, private var user: UserController) {
 
     private val db = FirebaseFirestore.getInstance()
 
-    init {
+    fun initFirestore() {
         setup()
         setupCacheSize()
-        getAllLevels()
     }
 
     private fun setup() {
@@ -32,9 +31,11 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
         db.firestoreSettings = settings
     }
 
-    private fun getAllLevels() {
+    fun getAllLevels() {
+        Log.d("toto", "getactuallevel: ${user.getActualLevel()}")
         db.collection("levels")
             .orderBy("levelNumber")
+            .whereGreaterThanOrEqualTo("levelNumber", user.getActualLevel())
             .get()
             .addOnCanceledListener { Log.d("toto", "errerur loading data")}
             .addOnSuccessListener { result ->
@@ -50,7 +51,7 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
 
                     //DownloadImageTask(imageLevel)
                     //    .execute(listLevels.first().image)
-                    user.setActualLevel(levelController.getLevel(0)!!.getID())
+                    user.setActualLevel(levelController.getLevel(0)!!.getLevelNumber())
                     levelController.setActualLevel(level)
                     levelController.setWordTemp(" ".repeat(level.getWord().length))
                     view.initUI()
@@ -62,8 +63,16 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
             }
     }
 
-    private fun saveLevel() {
-
+    fun saveLevel(user: User) {
+        db.collection("users")
+            .document(user.getID())
+            .update(mapOf(
+                "nbCoin" to user.getNbCoin(),
+                "actualLevel" to user.getActualLevel()
+            ))
+            .addOnSuccessListener {
+                Log.d("toto", "UPDATE ${user.getNbCoin()}")
+            }
     }
 
     fun getUserInfo(currentUser: User) {
@@ -75,8 +84,9 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
                 if (map.isEmpty()) {
                     setUser(currentUser)
                 } else {
-                    val user = User(map["id"] as String, map["pseudo"] as String, map["nbCoin"].toString().toInt(), map["actualLevel"] as String)
+                    val user = User(map["id"] as String, map["pseudo"] as String, map["nbCoin"].toString().toInt(), map["actualLevel"].toString().toInt())
                     this.user.setUser(user)
+                    getAllLevels()
                     Log.d("toto", "LOGGING $user")
                 }
 
@@ -84,7 +94,7 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
     }
 
     fun setUser(currentUser: User) {
-        val user = User(currentUser.getID(), currentUser.getPseudo(), 400, "")
+        val user = User(currentUser.getID(), currentUser.getPseudo(), 400, 1)
         db.collection("users")
             .document(currentUser.getID())
             .set(user)
