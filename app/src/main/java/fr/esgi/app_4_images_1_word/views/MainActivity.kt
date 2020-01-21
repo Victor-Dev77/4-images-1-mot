@@ -49,8 +49,9 @@ class MainActivity : AppCompatActivity() {
         initView()
 
         levelController = LevelController(userController, this)
-        firebaseAuthHelper = FirebaseAuthHelper(this, userController)
         firebaseFirestoreHelper = FirebaseFirestoreHelper(this, levelController, userController)
+        firebaseAuthHelper = FirebaseAuthHelper(this, firebaseFirestoreHelper, userController)
+
     }
 
     public override fun onStart() {
@@ -153,7 +154,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun insertRandomLetter(view: View, index: Int) {
         for (i in 0 until linearWord.childCount) {
-            var child = linearWord.getChildAt(i) as Button
+            val child = linearWord.getChildAt(i) as Button
             if (child.text == " ") {
                 replaceView(child, view)
                 gridLetters.addView(createLetterButton(" "), index)

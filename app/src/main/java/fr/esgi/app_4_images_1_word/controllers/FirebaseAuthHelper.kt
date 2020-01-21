@@ -7,7 +7,7 @@ import fr.esgi.app_4_images_1_word.models.User
 import fr.esgi.app_4_images_1_word.views.MainActivity
 
 
-class FirebaseAuthHelper(private val view: MainActivity, private val userController: UserController) {
+class FirebaseAuthHelper(private val view: MainActivity, private val firestore: FirebaseFirestoreHelper, private val userController: UserController) {
 
     private var auth = FirebaseAuth.getInstance()
 
@@ -15,8 +15,14 @@ class FirebaseAuthHelper(private val view: MainActivity, private val userControl
     fun signIn() {
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
-        if (currentUser != null)
-            userController.setUser(User(currentUser.uid, currentUser.displayName as String, 400, ""))
+        if (currentUser != null) {
+            // Get USER INFO FIRESTORE
+            val user = User(currentUser.uid, currentUser.displayName as String, 400, "")
+            firestore.getUserInfo(user)
+            return
+            //userController.setUser(User(currentUser.uid, currentUser.displayName as String, 400, ""))
+
+        }
         //updateUI(currentUser)
         Log.d("toto", "user: ${currentUser}")
         view.updateCoin()
@@ -27,7 +33,9 @@ class FirebaseAuthHelper(private val view: MainActivity, private val userControl
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("toto", "signInAnonymously:success")
-                    userController.setUser(User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 400, ""))
+                    val user = User(auth.currentUser?.uid as String, auth.currentUser?.displayName as String, 400, "")
+                    firestore.setUser(user)
+                    // userController.setUser()
                     Log.d("toto", "user: ${auth.currentUser!!.isAnonymous}")
                     view.updateCoin()
                 } else {
