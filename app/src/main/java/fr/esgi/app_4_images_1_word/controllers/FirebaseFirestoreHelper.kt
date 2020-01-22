@@ -7,7 +7,9 @@ import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.models.User
 import fr.esgi.app_4_images_1_word.views.MainActivity
 
-class FirebaseFirestoreHelper(private val view: MainActivity, private val levelController: LevelController, private var user: UserController) {
+class FirebaseFirestoreHelper(private val view: MainActivity,
+                              private val levelController: LevelController,
+                              private var user: UserController) {
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -36,23 +38,26 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
             .orderBy("levelNumber")
             .whereGreaterThanOrEqualTo("levelNumber", user.getActualLevel())
             .get()
-            .addOnCanceledListener { Log.d("toto", "errerur loading data")}
+            .addOnCanceledListener { view.alert("erreur loading data") }
             .addOnSuccessListener { result ->
-                for (document in result) {
+                result.forEach {document ->
                     val map = document.data
-                    val level = Level(document.id, (map["levelNumber"] as Long).toInt(), map["image"] as String, map["word"] as String, map["difficulty"] as String)
+                    val level = Level(
+                                    document.id,
+                                    (map["levelNumber"] as Long).toInt(),
+                                    map["image"] as String,
+                                    map["word"] as String,
+                                    map["difficulty"] as String)
+
                     levelController.addLevel(level)
                     Log.d("toto", "${document.id} => ${document.data}")
                 }
                 if (levelController.getNBLevel() > 0) {
                     val level = levelController.getLevel(0)!!
                     view.loadImage(level.image)
-
-                    //DownloadImageTask(imageLevel)
-                    //    .execute(listLevels.first().image)
                     user.setActualLevel(levelController.getLevel(0)!!.levelNumber)
                     levelController.setActualLevel(level)
-                    levelController.setWordTemp(" ".repeat(level.word.length))
+                    levelController.setWordTemp(EMPTY_STRING.repeat(level.word.length))
                     view.initUI()
                 }
 
@@ -86,7 +91,13 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
                     this.user.setUser(currentUser)
                     setUser(this.user.getUser())
                 } else {
-                    val userBDD = User(map["id"] as String, map["pseudo"] as String, map["nbCoin"].toString().toInt(), map["actualLevel"].toString().toInt())
+                    val userBDD =
+                        User(
+                            map["id"] as String,
+                            map["pseudo"] as String,
+                            map["nbCoin"].toString().toInt(),
+                            map["actualLevel"].toString().toInt()
+                        )
                     this.user.setUser(userBDD)
                     getAllLevels()
                     Log.d("toto", "LOGGING $user")

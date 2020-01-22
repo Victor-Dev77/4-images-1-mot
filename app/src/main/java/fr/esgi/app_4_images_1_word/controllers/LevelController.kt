@@ -5,7 +5,8 @@ import android.widget.Toast
 import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.views.MainActivity
 
-class LevelController(private val user: UserController, private val view: MainActivity) {
+class LevelController(private val user: UserController,
+                      private val view: MainActivity) {
 
     private lateinit var actualLevel: Level
     private val listLevels = ArrayList<Level>()
@@ -17,18 +18,15 @@ class LevelController(private val user: UserController, private val view: MainAc
     }
 
 
-    fun addLevel(level: Level) {
-        listLevels.add(level)
-    }
+    fun addLevel(level: Level) = listLevels.add(level)
+
 
     fun getNBLevel() : Int {
         return listLevels.size
     }
 
     fun getLevel(numLevel: Int) : Level? {
-        if  (numLevel < 0 || numLevel >= listLevels.size)
-            return null
-        return listLevels[numLevel]
+        return if (numLevel < 0 || numLevel >= listLevels.size) null else listLevels[numLevel]
     }
 
     fun getActualLevel(): Level {
@@ -53,9 +51,7 @@ class LevelController(private val user: UserController, private val view: MainAc
 
     fun randomLetterList(): ArrayList<Char> {
         val actualWord = actualLevel.word
-        wordTemp = " ".repeat(actualWord.length)
-        // STRING CHAR A METTRE EN CONSTANTE en faut class
-        val STRING_CHARACTERS = ('a'..'z').toList().toTypedArray()
+        wordTemp = EMPTY_STRING.repeat(actualWord.length)
         val letterArray : ArrayList<Char> = actualWord.toList() as ArrayList<Char>
         Log.d("toto", "$letterArray")
         (0 until (12 - actualWord.length)).forEach {
@@ -66,39 +62,40 @@ class LevelController(private val user: UserController, private val view: MainAc
     }
 
     fun verifyEndLevel() {
-        if (!(wordTemp.contains(' '))) {
+        if (!(wordTemp.contains(EMPTY_CHAR))) {
             if (verifyValidWord()) {
-                Log.d("toto", "MOT TROUVE !!!")
+                view.alert("MOT TROUVE !")
                 if (nextLevel())
                     view.winLevel()
                 else
                     view.finishGame()
             } else {
-                Log.d("toto", "MOT ERRONNE")
+                view.alert("MOT ERRONNE...")
                 view.loseLevel()
             }
         }
     }
 
     private fun verifyValidWord() : Boolean {
-        if (wordTemp.contains(' '))
+        if (wordTemp.contains(EMPTY_CHAR))
             return false
         return wordTemp.trim().toLowerCase() == actualLevel.word.trim().toLowerCase()
     }
 
     private fun nextLevel() : Boolean {
         user.increaseCoin(100)
-        if (listLevels.indexOf(actualLevel) + 1 < listLevels.size) {
+        return if (listLevels.indexOf(actualLevel) + 1 < listLevels.size) {
             val level = listLevels[listLevels.indexOf(actualLevel) + 1]
             user.setActualLevel(level.levelNumber)
             actualLevel = level
-            wordTemp = " ".repeat(level.word.length)
+            wordTemp = EMPTY_STRING.repeat(level.word.length)
             firestore.saveLevel(user.getUser())
-            return true
+            true
 
         } else {
             Log.d("toto", "JEU FINI !!!")
-            return false
+            view.alert("JEU FINI ! BRAVO")
+            false
         }
     }
 
@@ -107,7 +104,7 @@ class LevelController(private val user: UserController, private val view: MainAc
             view.alert("Pas assez de pièces !")
             return
         }
-        if (!(wordTemp.contains(' '))) {
+        if (!(wordTemp.contains(EMPTY_CHAR))) {
             view.alert("Enlever une lettre pour utiliser le bonus")
             return
         }
@@ -121,17 +118,17 @@ class LevelController(private val user: UserController, private val view: MainAc
 
         // update UI
         view.insertLetterWithBonus(newChar, arrayIndex[newIndex])
-
+        user.decreaseCoin(80)
+        view.updateCoin()
         verifyEndLevel()
     }
 
     private fun getMissingPositionWord(word: String) : Array<Int> {
-        if (!(word.contains(' ')))
+        if (!(word.contains(EMPTY_CHAR)))
             return ArrayList<Int>().toTypedArray()
 
+
         val array = ArrayList<Int>()
-
-
         for (i in word.indices) {
             if (word[i] == ' ') { // CAS 2 || word[i] != actualLevel.word[i]) {
                 array.add(i)
@@ -159,7 +156,7 @@ class LevelController(private val user: UserController, private val view: MainAc
         }
         val newIndex = (arrayIndex.keys).random()
         Log.d("toto", "array: $arrayIndex, index: $newIndex")
-        view.bonusRemoveLetter(arrayIndex[newIndex]!!, newIndex)
+        view.bonusRemoveLetter(arrayIndex[newIndex]!!)
         user.decreaseCoin(60)
         view.updateCoin()
     }

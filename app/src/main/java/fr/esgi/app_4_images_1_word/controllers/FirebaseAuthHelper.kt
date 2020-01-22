@@ -7,7 +7,9 @@ import fr.esgi.app_4_images_1_word.models.User
 import fr.esgi.app_4_images_1_word.views.MainActivity
 
 
-class FirebaseAuthHelper(private val view: MainActivity, private val firestore: FirebaseFirestoreHelper, private val userController: UserController) {
+class FirebaseAuthHelper(private val view: MainActivity,
+                         private val firestore: FirebaseFirestoreHelper,
+                         private val userController: UserController) {
 
     private var auth = FirebaseAuth.getInstance()
 
@@ -15,39 +17,32 @@ class FirebaseAuthHelper(private val view: MainActivity, private val firestore: 
     fun signIn() {
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
-        if (currentUser != null) {
-            // Get USER INFO FIRESTORE
-            val user = User(currentUser.uid, currentUser.displayName as String, 400, 1)
+        currentUser?.let { thisCurrentUser ->
+            val user = User(thisCurrentUser.uid, thisCurrentUser.displayName as String, 400, 1)
             firestore.getUserInfo(user)
-            //userController.setUser(User(currentUser.uid, currentUser.displayName as String, 400, ""))
             return
         }
-        //updateUI(currentUser)
+
         Log.d("toto", "user debut : ${currentUser?.uid}")
         view.updateCoin()
+
         auth.signInAnonymously()
-            .addOnFailureListener { res -> Log.d("toto", "NOP NOP")}
             .addOnCompleteListener(view) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("toto", "signInAnonymously:success")
-                    val user = User(auth.currentUser?.uid ?: "id", auth.currentUser?.displayName ?: "pseudo", 400, 1)
+                    val user = User(auth.currentUser?.uid ?: "id",
+                                auth.currentUser?.displayName ?: "pseudo",
+                                400,
+                             1)
                     userController.setUser(user)
                     firestore.setUser(user)
                     firestore.getAllLevels()
-                    // userController.setUser()
-                    Log.d("toto", "userbapre : ${auth.currentUser!!.isAnonymous}")
                     view.updateCoin()
 
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.d("toto", "signInAnonymously:failure", task.exception)
-                    Toast.makeText(view, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                    //updateUI(null)
-                }
+                } else
+                    view.alert("Authentication failed.")
 
-                // ...
             }
     }
 
