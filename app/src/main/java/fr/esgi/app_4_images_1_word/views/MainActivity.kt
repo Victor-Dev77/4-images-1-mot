@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
     fun initUI() {
         toolbarLevel.text = "Niveau ${userController.getActualLevel()}"
         toolbarCoin.text = "${userController.getCoin()}"
-        val actualWord = levelController.getActualLevel().getWord()
+        val actualWord = levelController.getActualLevel().word
         // Update Word
         linearWord.removeAllViews()
         (1..actualWord.length).forEach {
@@ -198,8 +198,8 @@ class MainActivity : AppCompatActivity() {
 
     fun winLevel() {
         toolbarCoin.text = "${userController.getCoin()}"
-        toolbarLevel.text = "Niveau ${levelController.getActualLevel().getLevelNumber()}"
-        loadImage(levelController.getActualLevel().getImage())
+        toolbarLevel.text = "Niveau ${levelController.getActualLevel().levelNumber}"
+        loadImage(levelController.getActualLevel().image)
         nextLevelUILetters()
         initUI()
     }
@@ -350,7 +350,7 @@ class MainActivity : AppCompatActivity() {
         val array : MutableMap<Int, Button> = mutableMapOf()
         for (i in 0 until gridLetters.childCount) {
             val child = gridLetters.getChildAt(i) as Button
-            if (child.text != " " && !(levelController.getActualLevel().getWord().contains(child.text))) {
+            if (child.text != " " && !(levelController.getActualLevel().word.contains(child.text))) {
                 array[i] = child
             }
         }

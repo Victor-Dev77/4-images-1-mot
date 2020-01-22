@@ -47,13 +47,13 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
                 }
                 if (levelController.getNBLevel() > 0) {
                     val level = levelController.getLevel(0)!!
-                    view.loadImage(level.getImage())
+                    view.loadImage(level.image)
 
                     //DownloadImageTask(imageLevel)
                     //    .execute(listLevels.first().image)
-                    user.setActualLevel(levelController.getLevel(0)!!.getLevelNumber())
+                    user.setActualLevel(levelController.getLevel(0)!!.levelNumber)
                     levelController.setActualLevel(level)
-                    levelController.setWordTemp(" ".repeat(level.getWord().length))
+                    levelController.setWordTemp(" ".repeat(level.word.length))
                     view.initUI()
                 }
 
@@ -65,19 +65,19 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
 
     fun saveLevel(user: User) {
         db.collection("users")
-            .document(user.getID())
+            .document(user.id)
             .update(mapOf(
-                "nbCoin" to user.getNbCoin(),
-                "actualLevel" to user.getActualLevel()
+                "nbCoin" to user.nbCoin,
+                "actualLevel" to user.actualLevel
             ))
             .addOnSuccessListener {
-                Log.d("toto", "UPDATE ${user.getNbCoin()}")
+                Log.d("toto", "UPDATE ${user.nbCoin}")
             }
     }
 
     fun getUserInfo(currentUser: User) {
         db.collection("users")
-            .document(currentUser.getID())
+            .document(currentUser.id)
             .get()
             .addOnSuccessListener {result ->
                 val map = (result.data)!!
@@ -94,9 +94,9 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
     }
 
     fun setUser(currentUser: User) {
-        val user = User(currentUser.getID(), currentUser.getPseudo(), 400, 1)
+        val user = User(currentUser.id, currentUser.pseudo, 400, 1)
         db.collection("users")
-            .document(currentUser.getID())
+            .document(currentUser.id)
             .set(user)
             .addOnSuccessListener {result ->
                 Log.d("toto", "USER INSCRIT DANS BDD")

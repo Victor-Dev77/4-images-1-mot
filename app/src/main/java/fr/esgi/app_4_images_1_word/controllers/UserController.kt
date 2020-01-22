@@ -7,30 +7,30 @@ class UserController {
     private val user = User("id", "pseudo", 0, 1)
 
     fun setUser(user: User) {
-        this.user.setID(user.getID())
-        this.user.setPseudo(user.getPseudo())
-        this.user.setNbCoin(user.getNbCoin())
-        this.user.setActualLevel(user.getActualLevel())
+        this.user.id = user.id
+        this.user.pseudo = user.pseudo
+        this.user.nbCoin = user.nbCoin
+        this.user.actualLevel = user.actualLevel
     }
 
     fun getCoin() : Int {
-        return user.getNbCoin()
+        return user.nbCoin
     }
 
     fun increaseCoin(coins: Int) {
-        user.setNbCoin(user.getNbCoin() + coins)
+        user.nbCoin = (user.nbCoin + coins)
     }
 
     fun decreaseCoin(coins: Int) {
-        user.setNbCoin(user.getNbCoin() - coins)
+        user.nbCoin = (user.nbCoin - coins)
     }
 
     fun setActualLevel(level: Int) {
-        user.setActualLevel(level)
+        user.actualLevel = level
     }
 
     fun getActualLevel() : Int {
-        return user.getActualLevel()
+        return user.actualLevel
     }
 
     fun getUser() : User {

@@ -52,7 +52,7 @@ class LevelController(private val user: UserController, private val view: MainAc
     }
 
     fun randomLetterList(): ArrayList<Char> {
-        val actualWord = actualLevel.getWord()
+        val actualWord = actualLevel.word
         wordTemp = " ".repeat(actualWord.length)
         // STRING CHAR A METTRE EN CONSTANTE en faut class
         val STRING_CHARACTERS = ('a'..'z').toList().toTypedArray()
@@ -83,16 +83,16 @@ class LevelController(private val user: UserController, private val view: MainAc
     private fun verifyValidWord() : Boolean {
         if (wordTemp.contains(' '))
             return false
-        return wordTemp.trim().toLowerCase() == actualLevel.getWord().trim().toLowerCase()
+        return wordTemp.trim().toLowerCase() == actualLevel.word.trim().toLowerCase()
     }
 
     private fun nextLevel() : Boolean {
         user.increaseCoin(100)
         if (listLevels.indexOf(actualLevel) + 1 < listLevels.size) {
             val level = listLevels[listLevels.indexOf(actualLevel) + 1]
-            user.setActualLevel(level.getLevelNumber())
+            user.setActualLevel(level.levelNumber)
             actualLevel = level
-            wordTemp = " ".repeat(level.getWord().length)
+            wordTemp = " ".repeat(level.word.length)
             firestore.saveLevel(user.getUser())
             return true
 
@@ -113,7 +113,7 @@ class LevelController(private val user: UserController, private val view: MainAc
         }
         val arrayIndex = getMissingPositionWord(wordTemp)
         val newIndex = (arrayIndex.indices).random()
-        val newChar = actualLevel.getWord()[arrayIndex[newIndex]]
+        val newChar = actualLevel.word[arrayIndex[newIndex]]
         Log.d("toto", "new Char -> $newChar")
         arrayIndex.forEach {
             Log.d("toto", "index array: $it")
