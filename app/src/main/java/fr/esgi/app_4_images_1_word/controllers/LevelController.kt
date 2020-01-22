@@ -128,12 +128,17 @@ class LevelController(private val user: UserController, private val view: MainAc
     private fun getMissingPositionWord(word: String) : Array<Int> {
         if (!(word.contains(' ')))
             return ArrayList<Int>().toTypedArray()
+
         val array = ArrayList<Int>()
+
+
         for (i in word.indices) {
             if (word[i] == ' ') { // CAS 2 || word[i] != actualLevel.word[i]) {
                 array.add(i)
             }
         }
+
+
         return array.toTypedArray()
     }
 

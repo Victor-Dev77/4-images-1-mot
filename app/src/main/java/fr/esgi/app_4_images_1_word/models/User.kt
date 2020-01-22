@@ -1,7 +1,8 @@
 package fr.esgi.app_4_images_1_word.models
 
-class User (var id: String, var pseudo: String, var nbCoin: Int, var actualLevel: Int) {
+data class User (var id: String, var pseudo: String, var nbCoin: Int, var actualLevel: Int) {
 
+    // A SUPPRIMER
     fun getUser() : User {
         return User(id, pseudo, nbCoin, actualLevel)
     }

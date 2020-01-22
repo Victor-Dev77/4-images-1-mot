@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         firebaseFirestoreHelper.initFirestore()
         firebaseAuthHelper = FirebaseAuthHelper(this, firebaseFirestoreHelper, userController)
         levelController.setFirestore(firebaseFirestoreHelper)
-
     }
 
     public override fun onStart() {

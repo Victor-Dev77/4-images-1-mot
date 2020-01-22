@@ -1,7 +1,6 @@
 package fr.esgi.app_4_images_1_word.controllers
 
 import android.util.Log
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import fr.esgi.app_4_images_1_word.models.Level
@@ -76,16 +75,19 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
     }
 
     fun getUserInfo(currentUser: User) {
+        Log.d("toto", "current user ${currentUser.id}")
         db.collection("users")
             .document(currentUser.id)
             .get()
             .addOnSuccessListener {result ->
-                val map = (result.data)!!
+
+                val map = (result.data)?: emptyMap()
                 if (map.isEmpty()) {
-                    setUser(currentUser)
+                    this.user.setUser(currentUser)
+                    setUser(this.user.getUser())
                 } else {
-                    val user = User(map["id"] as String, map["pseudo"] as String, map["nbCoin"].toString().toInt(), map["actualLevel"].toString().toInt())
-                    this.user.setUser(user)
+                    val userBDD = User(map["id"] as String, map["pseudo"] as String, map["nbCoin"].toString().toInt(), map["actualLevel"].toString().toInt())
+                    this.user.setUser(userBDD)
                     getAllLevels()
                     Log.d("toto", "LOGGING $user")
                 }
@@ -94,10 +96,16 @@ class FirebaseFirestoreHelper(private val view: MainActivity, private val levelC
     }
 
     fun setUser(currentUser: User) {
-        val user = User(currentUser.id, currentUser.pseudo, 400, 1)
+        Log.d("toto", "user setuser: ${currentUser.id}")
+        val userBDD = User(currentUser.id, currentUser.pseudo, 400, 1)
         db.collection("users")
-            .document(currentUser.id)
-            .set(user)
+            .document(userBDD.id)
+            .set(mapOf(
+                "id" to userBDD.id,
+                "pseudo" to userBDD.pseudo,
+                "nbCoin" to userBDD.nbCoin,
+                "actualLevel" to userBDD.actualLevel
+            ))
             .addOnSuccessListener {result ->
                 Log.d("toto", "USER INSCRIT DANS BDD")
             }
