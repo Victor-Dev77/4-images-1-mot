@@ -34,20 +34,20 @@ class FirebaseFirestoreHelper(private val view: MainActivity,
 
     fun getAllLevels() {
         Log.d("toto", "getactuallevel: ${user.getActualLevel()}")
-        db.collection("levels")
-            .orderBy("levelNumber")
-            .whereGreaterThanOrEqualTo("levelNumber", user.getActualLevel())
+        db.collection(COLLECTION_LEVEL)
+            .orderBy(LEVEL_COL_LEVELNUMBER)
+            .whereGreaterThanOrEqualTo(LEVEL_COL_LEVELNUMBER, user.getActualLevel())
             .get()
-            .addOnCanceledListener { view.alert("erreur loading data") }
+            .addOnCanceledListener { view.alert(ALERT_DATA_ERROR) }
             .addOnSuccessListener { result ->
                 result.forEach {document ->
                     val map = document.data
                     val level = Level(
                                     document.id,
-                                    (map["levelNumber"] as Long).toInt(),
-                                    map["image"] as String,
-                                    map["word"] as String,
-                                    map["difficulty"] as String)
+                                    (map[LEVEL_COL_LEVELNUMBER] as Long).toInt(),
+                                    map[LEVEL_COL_IMAGE] as String,
+                                    map[LEVEL_COL_WORD] as String,
+                                    map[LEVEL_COL_DIFFICULTY] as String)
 
                     levelController.addLevel(level)
                     Log.d("toto", "${document.id} => ${document.data}")
@@ -68,11 +68,11 @@ class FirebaseFirestoreHelper(private val view: MainActivity,
     }
 
     fun saveLevel(user: User) {
-        db.collection("users")
+        db.collection(COLLECTION_USER)
             .document(user.id)
             .update(mapOf(
-                "nbCoin" to user.nbCoin,
-                "actualLevel" to user.actualLevel
+                USER_COL_NBCOIN to user.nbCoin,
+                USER_COL_ACTUALLEVEL to user.actualLevel
             ))
             .addOnSuccessListener {
                 Log.d("toto", "UPDATE ${user.nbCoin}")
@@ -81,7 +81,7 @@ class FirebaseFirestoreHelper(private val view: MainActivity,
 
     fun getUserInfo(currentUser: User) {
         Log.d("toto", "current user ${currentUser.id}")
-        db.collection("users")
+        db.collection(COLLECTION_USER)
             .document(currentUser.id)
             .get()
             .addOnSuccessListener {result ->
@@ -93,10 +93,10 @@ class FirebaseFirestoreHelper(private val view: MainActivity,
                 } else {
                     val userBDD =
                         User(
-                            map["id"] as String,
-                            map["pseudo"] as String,
-                            map["nbCoin"].toString().toInt(),
-                            map["actualLevel"].toString().toInt()
+                            map[USER_COL_ID] as String,
+                            map[USER_COL_PSEUDO] as String,
+                            map[USER_COL_NBCOIN].toString().toInt(),
+                            map[USER_COL_ACTUALLEVEL].toString().toInt()
                         )
                     this.user.setUser(userBDD)
                     getAllLevels()
@@ -108,16 +108,16 @@ class FirebaseFirestoreHelper(private val view: MainActivity,
 
     fun setUser(currentUser: User) {
         Log.d("toto", "user setuser: ${currentUser.id}")
-        val userBDD = User(currentUser.id, currentUser.pseudo, 400, 1)
-        db.collection("users")
+        val userBDD = User(currentUser.id, currentUser.pseudo, START_NB_COIN, START_LEVEL)
+        db.collection(COLLECTION_USER)
             .document(userBDD.id)
             .set(mapOf(
-                "id" to userBDD.id,
-                "pseudo" to userBDD.pseudo,
-                "nbCoin" to userBDD.nbCoin,
-                "actualLevel" to userBDD.actualLevel
+                USER_COL_ID to userBDD.id,
+                USER_COL_PSEUDO to userBDD.pseudo,
+                USER_COL_NBCOIN to userBDD.nbCoin,
+                USER_COL_ACTUALLEVEL to userBDD.actualLevel
             ))
-            .addOnSuccessListener {result ->
+            .addOnSuccessListener {
                 Log.d("toto", "USER INSCRIT DANS BDD")
             }
     }

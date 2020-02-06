@@ -3,7 +3,6 @@ package fr.esgi.app_4_images_1_word.views
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.*
@@ -27,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gridLetters: GridLayout
     private lateinit var bonusABtn: ImageButton
     private lateinit var bonusBBtn: ImageButton
-    private var SIZE_BUTTON = 0
+    private var sizeButton = 0
 
     // Variable Controller
     private var userController = UserController()
@@ -42,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         // remove status bar
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_main)
-        SIZE_BUTTON = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45f, resources.displayMetrics)).toInt()
+        sizeButton = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45f, resources.displayMetrics)).toInt()
         initView()
         initController()
     }
@@ -74,8 +73,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun initUI() {
-        //TODO: externationnalization string with variable %s
-        toolbarLevel.text = "Niveau ${userController.getActualLevel()}"
+        toolbarLevel.text = getString(R.string.toolbar_level, userController.getActualLevel())
         toolbarCoin.text = "${userController.getCoin()}"
         initUIWord()
         initUIRandomLetters()
@@ -85,7 +83,7 @@ class MainActivity : AppCompatActivity() {
     private fun initUIWord() {
         val actualWord = levelController.getActualLevel().word
         linearWord.removeAllViews()
-        (1..actualWord.length).forEach {
+        (1..actualWord.length).forEach { _ ->
             val view = createWordButton()
             linearWord.addView(view)
         }
@@ -112,8 +110,8 @@ class MainActivity : AppCompatActivity() {
     private fun createBasicButtonView() : Button {
         val view = Button(this)
         val params = LinearLayout.LayoutParams(
-            SIZE_BUTTON,
-            SIZE_BUTTON
+            sizeButton,
+            sizeButton
         )
         params.setMargins(4,4,4,4)
         view.layoutParams = params
@@ -223,9 +221,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun winLevel() {
-        //TODO: externationnalization string with variable %s
         toolbarCoin.text = "${userController.getCoin()}"
-        toolbarLevel.text = "Niveau ${levelController.getActualLevel().levelNumber}"
+        toolbarLevel.text = getString(R.string.toolbar_level, levelController.getActualLevel().levelNumber)
         loadImage(levelController.getActualLevel().image)
         nextLevelUILetters()
         initUI()
@@ -236,8 +233,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun finishGame() {
-        //TODO: externationnalization string
-        toolbarLevel.text = "JEU FINI !"
+        toolbarLevel.text = getString(R.string.finish_game)
     }
 
     //region Bonus Add Letter
@@ -261,31 +257,12 @@ class MainActivity : AppCompatActivity() {
         if (!find) {
             for (i in 0 until linearWord.childCount) {
                 val childLetter = linearWord.getChildAt(i) as Button
-                // CAS N1: si lettre index == vide && lettre i == lettre =>
-                // => remplace word index ' ' par lettre + remplace i lettre par ' '
-                // CAS N2: lettre index == autre lettre && lettre i == lettre =>
-                // => save word index autre lettre + remplace word index autre lettre par lettre
-                // + remplace i lettre par ' ' + mettre index autre lettre dans grid
-
-                // CAS 1
                 if (childWord.text == EMPTY_STRING && childLetter.text == "$letter") {
-                    //replaceViewBonusCas1(childWord, childLetter)
-                    //linearWord.addView(createWordButton(), i)
                     levelController.setWordTemp(index, "$letter")
                     levelController.setWordTemp(i, EMPTY_STRING)
                     replaceViewBonusCas1Bis(levelController.getWordTemp())
                     break
                 }
-
-                // CAS 2
-               /* else if (childWord.text != " " && childLetter.text == "$letter") {
-                    replaceViewBonusCas2(childWord, childLetter)
-                    linearWord.addView(createWordButton(), i)
-                    word = StringBuilder(word).replace(index, index + 1, "$letter").toString()
-                    word = StringBuilder(word).replace(i, i + 1, " ").toString()
-                    Log.d("toto", "not find CAS 2 word bonus => $word")
-                    break
-                }*/
             }
         }
     }
@@ -307,38 +284,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    /*private fun replaceViewBonusCas1(currentView: View, newView: View) {
-        val parent = currentView.parent as? ViewGroup
-        val index = parent?.indexOfChild(currentView)
-        Log.d("toto", "index replace $index")
-        if (index != null) {
-            removeView(currentView)
-            removeView(newView)
-            parent.addView(newView, index )
-        }
-    }*/
-
-    /*private fun replaceViewBonusCas2(currentView: View, newView: View) {
-        val parent = currentView.parent as? ViewGroup
-        val index = parent?.indexOfChild(currentView)
-        Log.d("toto", "index replace $index")
-        if (index != null) {
-            removeView(currentView)
-            removeView(newView)
-            parent.addView(newView, index )
-            for (i in 0 until gridLetters.childCount) {
-                val child = gridLetters.getChildAt(i) as Button
-                val background = child.background
-                if (background is ColorDrawable)
-                    if (background.color == Color.TRANSPARENT) {
-                        gridLetters.removeViewAt(i)
-                        gridLetters.addView(currentView, i)
-                        break
-                    }
-            }
-        }
-    }*/
 
     //endregion
 

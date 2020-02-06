@@ -4,7 +4,7 @@ import fr.esgi.app_4_images_1_word.models.User
 
 class UserController {
 
-    private val user = User("id1", "pseudo", 0, 1)
+    private val user = User(USER_COL_ID, USER_COL_PSEUDO, START_NB_COIN, START_LEVEL)
 
     fun setUser(user: User) {
         this.user.id = user.id

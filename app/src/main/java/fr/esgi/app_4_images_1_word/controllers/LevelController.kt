@@ -1,7 +1,6 @@
 package fr.esgi.app_4_images_1_word.controllers
 
 import android.util.Log
-import android.widget.Toast
 import fr.esgi.app_4_images_1_word.models.Level
 import fr.esgi.app_4_images_1_word.views.MainActivity
 
@@ -21,25 +20,18 @@ class LevelController(private val user: UserController,
     fun addLevel(level: Level) = listLevels.add(level)
 
 
-    fun getNBLevel() : Int {
-        return listLevels.size
-    }
+    fun getNBLevel() : Int = listLevels.size
 
-    fun getLevel(numLevel: Int) : Level? {
-        return if (numLevel < 0 || numLevel >= listLevels.size) null else listLevels[numLevel]
-    }
+    fun getLevel(numLevel: Int) : Level? = if (numLevel < 0 || numLevel >= listLevels.size) null else listLevels[numLevel]
 
-    fun getActualLevel(): Level {
-        return actualLevel
-    }
+
+    fun getActualLevel(): Level = actualLevel
 
     fun setActualLevel(level: Level) {
         actualLevel = level
     }
 
-    fun getWordTemp() : String {
-        return wordTemp
-    }
+    fun getWordTemp() : String = wordTemp
 
     fun setWordTemp(word: String) {
         wordTemp = word
@@ -53,8 +45,7 @@ class LevelController(private val user: UserController,
         val actualWord = actualLevel.word
         wordTemp = EMPTY_STRING.repeat(actualWord.length)
         val letterArray : ArrayList<Char> = actualWord.toList() as ArrayList<Char>
-        Log.d("toto", "$letterArray")
-        (0 until (12 - actualWord.length)).forEach {
+        (0 until (12 - actualWord.length)).forEach { _ ->
             letterArray.add(STRING_CHARACTERS.random())
         }
         letterArray.shuffle()
@@ -64,26 +55,27 @@ class LevelController(private val user: UserController,
     fun verifyEndLevel() {
         if (!(wordTemp.contains(EMPTY_CHAR))) {
             if (verifyValidWord()) {
-                view.alert("MOT TROUVE !")
+                view.alert(WORD_FIND)
                 if (nextLevel())
                     view.winLevel()
                 else
                     view.finishGame()
             } else {
-                view.alert("MOT ERRONNE...")
+                view.alert(WORD_ERROR)
                 view.loseLevel()
             }
         }
     }
 
     private fun verifyValidWord() : Boolean {
-        if (wordTemp.contains(EMPTY_CHAR))
-            return false
-        return wordTemp.trim().toLowerCase() == actualLevel.word.trim().toLowerCase()
+        return if (wordTemp.contains(EMPTY_CHAR))
+                   false
+               else
+                   wordTemp.trim().toLowerCase() == actualLevel.word.trim().toLowerCase()
     }
 
     private fun nextLevel() : Boolean {
-        user.increaseCoin(100)
+        user.increaseCoin(PRICE_WIN_LEVEL)
         return if (listLevels.indexOf(actualLevel) + 1 < listLevels.size) {
             val level = listLevels[listLevels.indexOf(actualLevel) + 1]
             user.setActualLevel(level.levelNumber)
@@ -94,18 +86,18 @@ class LevelController(private val user: UserController,
 
         } else {
             Log.d("toto", "JEU FINI !!!")
-            view.alert("JEU FINI ! BRAVO")
+            view.alert(FINISH_GAME)
             false
         }
     }
 
     fun bonusAddLetter() {
-        if (user.getCoin() - 80 < 0) {
-            view.alert("Pas assez de pièces !")
+        if (user.getCoin() - PRICE_BONUS_ADD_LETTER < 0) {
+            view.alert(ALERT_MISSING_COIN)
             return
         }
         if (!(wordTemp.contains(EMPTY_CHAR))) {
-            view.alert("Enlever une lettre pour utiliser le bonus")
+            view.alert(ALERT_MANY_LETTERS)
             return
         }
         val arrayIndex = getMissingPositionWord(wordTemp)
@@ -118,7 +110,7 @@ class LevelController(private val user: UserController,
 
         // update UI
         view.insertLetterWithBonus(newChar, arrayIndex[newIndex])
-        user.decreaseCoin(80)
+        user.decreaseCoin(PRICE_BONUS_ADD_LETTER)
         view.updateCoin()
         verifyEndLevel()
     }
@@ -126,38 +118,34 @@ class LevelController(private val user: UserController,
     private fun getMissingPositionWord(word: String) : Array<Int> {
         if (!(word.contains(EMPTY_CHAR)))
             return ArrayList<Int>().toTypedArray()
-
-
         val array = ArrayList<Int>()
         for (i in word.indices) {
-            if (word[i] == ' ') { // CAS 2 || word[i] != actualLevel.word[i]) {
+            if (word[i] == EMPTY_CHAR) {
                 array.add(i)
             }
         }
-
-
         return array.toTypedArray()
     }
 
     fun bonusDeleteLetter() {
-        if (user.getCoin() - 60 < 0) {
-            view.alert("Pas assez de pièces !")
+        if (user.getCoin() - PRICE_BONUS_DELETE_LETTER < 0) {
+            view.alert(ALERT_MISSING_COIN)
             return
         }
-        if (!(wordTemp.contains(' '))) {
-            view.alert("Enlever une lettre pour utiliser le bonus")
+        if (!(wordTemp.contains(EMPTY_CHAR))) {
+            view.alert(ALERT_MANY_LETTERS)
             return
         }
 
         val arrayIndex = view.getMissingPositionLettersGrid()
         if (arrayIndex.isEmpty()) {
-            view.alert("Toutes les lettres sont supprimées")
+            view.alert(ALERT_EMPTY_WORD)
             return
         }
         val newIndex = (arrayIndex.keys).random()
         Log.d("toto", "array: $arrayIndex, index: $newIndex")
         view.bonusRemoveLetter(arrayIndex[newIndex]!!)
-        user.decreaseCoin(60)
+        user.decreaseCoin(PRICE_BONUS_DELETE_LETTER)
         view.updateCoin()
     }
 
